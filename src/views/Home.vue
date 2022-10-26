@@ -40,24 +40,36 @@ export default {
       genresUri: 'http://localhost:3000/genres'
     }
   },
-  mounted () {
-    Promise.all([
-      fetch(this.booksUri),
-      fetch(this.copiesUri),
-      fetch(this.authorsUri),
-      fetch(this.genresUri)
-    ]).then(
-      resp => Promise.all(resp.map(e => e.json()))
-    ).then(
-      data => {
-        console.log(data)
-        this.booksCnt = data[0].length
-        this.copiesCnt = data[1].length
-        this.availableCopiesCnt = data[1].filter(e => e.status === 'Available').length
-        this.authorsCnt = data[2].length
-        this.genresCnt = data[3].length
-      }
-    ).catch(err => console.log(err))
+  async mounted () {
+    // Promise.all([
+    // fetch(this.booksUri),
+    // fetch(this.copiesUri),
+    // fetch(this.authorsUri),
+    // fetch(this.genresUri)
+    // ]).then(
+    // resp => Promise.all(resp.map(e => e.json()))
+    // ).then(
+    // data => {
+    // console.log(data)
+    // this.booksCnt = data[0].length
+    // this.copiesCnt = data[1].length
+    // this.availableCopiesCnt = data[1].filter(e => e.status === 'Available').length
+    // this.authorsCnt = data[2].length
+    // this.genresCnt = data[3].length
+    // }
+    // ).catch(err => console.log(err))
+    try {
+      const resp = await Promise.all([fetch(this.booksUri), fetch(this.copiesUri), fetch(this.authorsUri), fetch(this.genresUri)])
+      const data = await Promise.all(resp.map(e => e.json()))
+      console.log(data)
+      this.booksCnt = data[0].length
+      this.copiesCnt = data[1].length
+      this.availableCopiesCnt = data[1].filter(e => e.status === 'Available').length
+      this.authorsCnt = data[2].length
+      this.genresCnt = data[3].length
+    } catch (err) {
+      console.log(err)
+    }
   }
 }
 </script>
