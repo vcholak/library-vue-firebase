@@ -49,13 +49,10 @@ export default {
       statuses: ['Maintenance', 'Available', 'Loaned', 'Reserved']
     }
   },
-  mounted () {
-    Promise.all([
-      fetch(this.uri),
-      fetch(this.booksUri)
-    ]).then(
-      resp => Promise.all(resp.map(e => e.json()))
-    ).then(data => {
+  async mounted () {
+    try {
+      const resp = await Promise.all([fetch(this.uri), fetch(this.booksUri)])
+      const data = await Promise.all(resp.map(e => e.json()))
       const copy = data[0]
       this.bookId = copy.bookId
       this.bookTitle = copy.bookTitle
@@ -64,10 +61,12 @@ export default {
       this.status = copy.status
       this.books = data[1]
       this.loaded = true
-    }).catch(err => console.log(err))
+    } catch (err) {
+      console.log(err)
+    }
   },
   methods: {
-    handleSubmit () {
+    async handleSubmit () {
       const bookCopy = {
         bookId: this.bookId,
         bookTitle: this.books.find(e => e.id === this.bookId).title,
@@ -75,13 +74,16 @@ export default {
         availableDate: this.availableDate,
         status: this.status
       }
-      fetch(this.uri, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookCopy)
-      }).then(() => {
+      try {
+        await fetch(this.uri, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookCopy)
+        })
         this.$router.push('/copies') // redirect to book copy list
-      }).catch(err => console.log(err))
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 
