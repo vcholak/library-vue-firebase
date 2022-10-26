@@ -44,18 +44,17 @@ export default {
       books: []
     }
   },
-  mounted () {
-    Promise.all([
-      fetch(this.uri),
-      fetch(this.booksUri)
-    ]).then(
-      resp => Promise.all(resp.map(e => e.json()))
-    ).then(data => {
+  async mounted () {
+    try {
+      const resp = await Promise.all([fetch(this.uri), fetch(this.booksUri)])
+      const data = await Promise.all(resp.map(e => e.json()))
       this.author = data[0]
       const allBooks = data[1]
       this.books = allBooks.filter(b => b.authorId === Number(this.id))
       this.loaded = true
-    }).catch(err => console.log(err))
+    } catch (err) {
+      console.log(err)
+    }
   },
   methods: {
     deleteAuthor () {
