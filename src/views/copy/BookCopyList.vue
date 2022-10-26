@@ -19,11 +19,14 @@ export default {
       uri: 'http://localhost:3000/copies'
     }
   },
-  mounted () {
-    fetch(this.uri)
-      .then(resp => resp.json())
-      .then(data => { this.copies = data })
-      .catch(err => console.log(err))
+  async mounted () {
+    try {
+      const resp = await fetch(this.uri)
+      const data = await resp.json()
+      this.copies = data
+    } catch (err) {
+      console.log(err)
+    }
   }
 }
 </script>
