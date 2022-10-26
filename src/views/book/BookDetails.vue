@@ -78,12 +78,14 @@ export default {
     }
   },
   methods: {
-    deleteBook () {
+    async deleteBook () {
       if (confirm('Do you really want to delete this Book?')) {
-        fetch(this.bookUri, { method: 'DELETE' })
-          .then(() => {
-            this.$router.push('/books') // redirect to book list
-          }).catch(err => console.log(err))
+        try {
+          await fetch(this.bookUri, { method: 'DELETE' })
+          this.$router.push('/books') // redirect to book list
+        } catch (err) {
+          console.log(err)
+        }
       }
     }
   }
