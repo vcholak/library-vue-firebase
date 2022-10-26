@@ -53,7 +53,7 @@ export default {
       .catch(err => console.log(err))
   },
   methods: {
-    handleSubmit () {
+    async handleSubmit () {
       const author = {
         firstName: this.firstName,
         familyName: this.familyName,
@@ -61,13 +61,16 @@ export default {
         deathDate: this.deathDate
       }
       console.log(author)
-      fetch(this.uri, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(author)
-      }).then(() => {
+      try {
+        await fetch(this.uri, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(author)
+        })
         this.$router.push('/authors') // redirect to author list
-      }).catch(err => console.log(err))
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 }
