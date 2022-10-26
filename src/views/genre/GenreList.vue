@@ -21,11 +21,14 @@ export default {
       uri: 'http://localhost:3000/genres'
     }
   },
-  mounted () {
-    fetch(this.uri)
-      .then(resp => resp.json())
-      .then(data => { this.genres = data })
-      .catch(err => console.log(err))
+  async mounted () {
+    try {
+      const resp = await fetch(this.uri)
+      const data = await resp.json()
+      this.genres = data
+    } catch (err) {
+      console.log(err)
+    }
   }
 }
 </script>
