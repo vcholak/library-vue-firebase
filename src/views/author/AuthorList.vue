@@ -20,10 +20,6 @@ export default {
     }
   },
   async mounted () {
-    // fetch(this.uri)
-    // .then(resp => resp.json())
-    // .then(data => { this.authors = data })
-    // .catch(err => console.log(err))
     try {
       const resp = await fetch(this.uri)
       const data = await resp.json()
