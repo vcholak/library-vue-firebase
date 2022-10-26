@@ -19,11 +19,14 @@ export default {
       uri: 'http://localhost:3000/books'
     }
   },
-  mounted () {
-    fetch(this.uri)
-      .then(resp => resp.json())
-      .then(data => { this.books = data })
-      .catch(err => console.log(err))
+  async mounted () {
+    try {
+      const resp = await fetch(this.uri)
+      const data = await resp.json()
+      this.books = data
+    } catch (err) {
+      console.log(err)
+    }
   }
 
 }
