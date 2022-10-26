@@ -60,28 +60,22 @@ export default {
       copiesUri: 'http://localhost:3000/copies'
     }
   },
-  mounted () {
-    fetch(this.bookUri)
-      .then(resp => resp.json())
-      .then(data => {
-        this.book = data
-        const authorUri = 'http://localhost:3000/authors/' + data.authorId
-        const genreIds = data.genreIds
-        Promise.all([
-          fetch(authorUri),
-          fetch(this.genresUri),
-          fetch(this.copiesUri)
-        ]).then(
-          resp => Promise.all(resp.map(e => e.json()))
-        ).then(
-          data => {
-            this.author = data[0]
-            this.genres = data[1].filter(e => genreIds.includes(e.id))
-            this.copies = data[2].filter(c => c.bookId === this.book.id)
-            this.loaded = true
-          }
-        ).catch(err => console.log(err))
-      }).catch(err => console.log(err))
+  async mounted () {
+    try {
+      const resp = await fetch(this.bookUri)
+      const book = await resp.json()
+      this.book = book
+      const authorUri = 'http://localhost:3000/authors/' + book.authorId
+      const genreIds = book.genreIds
+      const resp2 = await Promise.all([fetch(authorUri), fetch(this.genresUri), fetch(this.copiesUri)])
+      const data = await Promise.all(resp2.map(e => e.json()))
+      this.author = data[0]
+      this.genres = data[1].filter(e => genreIds.includes(e.id))
+      this.copies = data[2].filter(c => c.bookId === this.book.id)
+      this.loaded = true
+    } catch (err) {
+      console.log(err)
+    }
   },
   methods: {
     deleteBook () {
