@@ -19,14 +19,17 @@ export default {
     }
   },
   methods: {
-    handleSubmit () {
-      fetch('http://localhost:3000/genres', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: this.name })
-      }).then(() => {
+    async handleSubmit () {
+      try {
+        await fetch('http://localhost:3000/genres', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: this.name })
+        })
         this.$router.push('/genres') // redirect to genre list
-      }).catch(err => console.log(err))
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 }
