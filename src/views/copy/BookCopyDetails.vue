@@ -31,19 +31,24 @@ export default {
       copy: null
     }
   },
-  mounted () {
-    fetch(this.uri)
-      .then(resp => resp.json())
-      .then(data => { this.copy = data })
-      .catch(err => console.log(err))
+  async mounted () {
+    try {
+      const resp = await fetch(this.uri)
+      const data = await resp.json()
+      this.copy = data
+    } catch (err) {
+      console.log(err)
+    }
   },
   methods: {
-    deleteBookCopy () {
+    async deleteBookCopy () {
       if (confirm('Do you really want to delete this book copy?')) {
-        fetch(this.uri, { method: 'DELETE' })
-          .then(() => {
-            this.$router.push('/copies') // redirect to book copy list
-          }).catch(err => console.log(err))
+        try {
+          await fetch(this.uri, { method: 'DELETE' })
+          this.$router.push('/copies') // redirect to book copy list
+        } catch (err) {
+          console.log(err)
+        }
       }
     }
   }
