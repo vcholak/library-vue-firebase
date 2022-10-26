@@ -80,7 +80,7 @@ export default {
     ).catch(err => console.log(err))
   },
   methods: {
-    handleSubmit () {
+    async handleSubmit () {
       const book = {
         title: this.title,
         authorId: this.authorId,
@@ -89,13 +89,16 @@ export default {
         genreIds: this.genreIds
       }
       console.log(book)
-      fetch('http://localhost:3000/books', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(book)
-      }).then(() => {
+      try {
+        await fetch('http://localhost:3000/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(book)
+        })
         this.$router.push('/books') // redirect to book list
-      }).catch(err => console.log(err))
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 }
