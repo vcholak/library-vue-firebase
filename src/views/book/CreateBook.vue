@@ -55,29 +55,16 @@ export default {
       genreIds: []
     }
   },
-  mounted () {
-    // Promise.all([
-    //   fetch(this.authorsUri)
-    //     .then(resp => resp.json())
-    //     .then(data => { this.authors = data })
-    //     .catch(err => console.log(err)),
-    //   fetch(this.genresUri)
-    //     .then(resp => resp.json())
-    //     .then(data => { this.genres = data })
-    //     .catch(err => console.log(err))
-    // ])
-    Promise.all([
-      fetch(this.authorsUri),
-      fetch(this.genresUri)
-    ]).then(
-      resp => Promise.all(resp.map(e => e.json()))
-    ).then(
-      data => {
-        console.log(data)
-        this.authors = data[0]
-        this.genres = data[1]
-      }
-    ).catch(err => console.log(err))
+  async mounted () {
+    try {
+      const resp = await Promise.all([fetch(this.authorsUri), fetch(this.genresUri)])
+      const data = await Promise.all(resp.map(e => e.json()))
+      console.log(data)
+      this.authors = data[0]
+      this.genres = data[1]
+    } catch (err) {
+      console.log(err)
+    }
   },
   methods: {
     async handleSubmit () {
