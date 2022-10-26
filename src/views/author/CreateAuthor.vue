@@ -34,7 +34,7 @@ export default {
     }
   },
   methods: {
-    handleSubmit () {
+    async handleSubmit () {
       const author = {
         firstName: this.firstName,
         familyName: this.familyName,
@@ -42,13 +42,17 @@ export default {
         deathDate: this.deathDate
       }
       console.log(author)
-      fetch('http://localhost:3000/authors', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(author)
-      }).then(() => {
+      try {
+        await fetch('http://localhost:3000/authors',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(author)
+          })
         this.$router.push('/authors') // redirect to author list
-      }).catch(err => console.log(err))
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 }
