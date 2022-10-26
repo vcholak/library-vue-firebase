@@ -46,14 +46,17 @@ export default {
       statuses: ['Maintenance', 'Available', 'Loaned', 'Reserved']
     }
   },
-  mounted () {
-    fetch(this.uri)
-      .then(resp => resp.json())
-      .then(data => { this.books = data })
-      .catch(err => console.log(err))
+  async mounted () {
+    try {
+      const resp = await fetch(this.uri)
+      const data = await resp.json()
+      this.books = data
+    } catch (err) {
+      console.log(err)
+    }
   },
   methods: {
-    handleSubmit () {
+    async handleSubmit () {
       const bookCopy = {
         bookId: this.bookId,
         bookTitle: this.books.find(e => e.id === this.bookId).title,
@@ -61,13 +64,16 @@ export default {
         availableDate: this.availableDate,
         status: this.status
       }
-      fetch('http://localhost:3000/copies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookCopy)
-      }).then(() => {
+      try {
+        await fetch('http://localhost:3000/copies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bookCopy)
+        })
         this.$router.push('/copies') // redirect to book copy list
-      }).catch(err => console.log(err))
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 
