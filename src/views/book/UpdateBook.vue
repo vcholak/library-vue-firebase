@@ -58,30 +58,25 @@ export default {
       genreIds: []
     }
   },
-  mounted () {
-    fetch(this.bookUri)
-      .then(resp => resp.json())
-      .then(data => {
-        console.log(data)
-        this.title = data.title
-        this.authorId = data.authorId
-        this.summary = data.summary
-        this.isbn = data.isbn
-        this.genreIds = data.genreIds
-        Promise.all([
-          fetch(this.authorsUri),
-          fetch(this.genresUri)
-        ]).then(
-          resp => Promise.all(resp.map(e => e.json()))
-        ).then(
-          data => {
-            console.log(data)
-            this.authors = data[0]
-            this.genres = data[1]
-            this.loaded = true
-          }
-        ).catch(err => console.log(err))
-      }).catch(err => console.log(err))
+  async mounted () {
+    try {
+      const resp = await fetch(this.bookUri)
+      const book = await resp.json()
+      console.log(book)
+      this.title = book.title
+      this.authorId = book.authorId
+      this.summary = book.summary
+      this.isbn = book.isbn
+      this.genreIds = book.genreIds
+      const resp2 = await Promise.all([fetch(this.authorsUri), fetch(this.genresUri)])
+      const data = await Promise.all(resp2.map(e => e.json()))
+      console.log(data)
+      this.authors = data[0]
+      this.genres = data[1]
+      this.loaded = true
+    } catch (err) {
+      console.log(err)
+    }
   },
   methods: {
     handleSubmit () {
