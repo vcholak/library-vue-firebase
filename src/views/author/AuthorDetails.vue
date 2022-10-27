@@ -33,38 +33,47 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
 export default {
   props: ['id'],
-  data () {
-    return {
-      loaded: false,
-      author: null,
-      uri: 'http://localhost:3000/authors/' + this.id,
-      booksUri: 'http://localhost:3000/books',
-      books: []
-    }
-  },
-  async mounted () {
-    try {
-      const resp = await Promise.all([fetch(this.uri), fetch(this.booksUri)])
-      const data = await Promise.all(resp.map(e => e.json()))
-      this.author = data[0]
-      const allBooks = data[1]
-      this.books = allBooks.filter(b => b.authorId === Number(this.id))
-      this.loaded = true
-    } catch (err) {
-      console.log(err)
-    }
-  },
-  methods: {
-    deleteAuthor () {
+  setup (props) {
+    const router = useRouter()
+    const uri = 'http://localhost:3000/authors/' + props.id
+    const booksUri = 'http://localhost:3000/books'
+
+    const loaded = ref(false)
+    const author = ref(null)
+    const books = ref([])
+
+    const deleteAuthor = async () => {
       if (confirm('Do you really want to delete this Author?')) {
-        fetch(this.uri, { method: 'DELETE' })
-          .then(() => {
-            this.$router.push('/authors') // redirect to author list
-          }).catch(err => console.log(err))
+        try {
+          await fetch(uri, { method: 'DELETE' })
+          router.push('/authors') // redirect to author list
+        } catch (err) {
+          console.log(err)
+        }
       }
     }
+
+    const load = async () => {
+      try {
+        const resp = await Promise.all([fetch(uri), fetch(booksUri)])
+        const data = await Promise.all(resp.map(e => e.json()))
+        author.value = data[0]
+        const allBooks = data[1]
+        books.value = allBooks.filter(b => b.authorId === Number(props.id))
+        loaded.value = true
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
+    load()
+
+    return { loaded, author, books, deleteAuthor }
   }
 }
 </script>
