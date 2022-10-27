@@ -11,28 +11,16 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import getAuthors from '../../composables/getAuthors'
 
 export default {
   name: 'AuthorList',
   setup () {
-    const uri = 'http://localhost:3000/authors'
-
-    const authors = ref([])
-
-    const load = async () => {
-      try {
-        const resp = await fetch(uri)
-        const data = await resp.json()
-        authors.value = data
-      } catch (err) {
-        console.log(err)
-      }
-    }
+    const { authors, error, load } = getAuthors()
 
     load()
 
-    return { authors }
+    return { authors, error }
   }
 }
 </script>
