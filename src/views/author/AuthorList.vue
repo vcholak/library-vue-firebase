@@ -11,24 +11,29 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+
 export default {
   name: 'AuthorList',
-  data () {
-    return {
-      authors: [],
-      uri: 'http://localhost:3000/authors'
-    }
-  },
-  async mounted () {
-    try {
-      const resp = await fetch(this.uri)
-      const data = await resp.json()
-      this.authors = data
-    } catch (err) {
-      console.log(err)
-    }
-  }
+  setup () {
+    const uri = 'http://localhost:3000/authors'
 
+    const authors = ref([])
+
+    const load = async () => {
+      try {
+        const resp = await fetch(uri)
+        const data = await resp.json()
+        authors.value = data
+      } catch (err) {
+        console.log(err)
+      }
+    }
+
+    load()
+
+    return { authors }
+  }
 }
 </script>
 
