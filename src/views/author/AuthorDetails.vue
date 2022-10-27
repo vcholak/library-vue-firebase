@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error">{{ error }}</div>
   <div v-if="loaded">
     <h1>Author: {{author.familyName}}, {{author.firstName}}</h1>
     <p>{{author.birthDate}} -
@@ -33,19 +34,20 @@
 </template>
 
 <script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+
+import { useRoute, useRouter } from 'vue-router'
+import getAuthor from '../../composables/getAuthor'
 
 export default {
   props: ['id'],
   setup (props) {
-    const router = useRouter()
-    const uri = 'http://localhost:3000/authors/' + props.id
-    const booksUri = 'http://localhost:3000/books'
+    const route = useRoute()
+    const id = route.params.id
+    const uri = 'http://localhost:3000/authors/' + id
 
-    const loaded = ref(false)
-    const author = ref(null)
-    const books = ref([])
+    const { error, loaded, author, books, load } = getAuthor(id, uri)
+
+    const router = useRouter()
 
     const deleteAuthor = async () => {
       if (confirm('Do you really want to delete this Author?')) {
@@ -58,22 +60,9 @@ export default {
       }
     }
 
-    const load = async () => {
-      try {
-        const resp = await Promise.all([fetch(uri), fetch(booksUri)])
-        const data = await Promise.all(resp.map(e => e.json()))
-        author.value = data[0]
-        const allBooks = data[1]
-        books.value = allBooks.filter(b => b.authorId === Number(props.id))
-        loaded.value = true
-      } catch (err) {
-        console.log(err)
-      }
-    }
-
     load()
 
-    return { loaded, author, books, deleteAuthor }
+    return { error, loaded, author, books, deleteAuthor }
   }
 }
 </script>
