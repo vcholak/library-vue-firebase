@@ -11,19 +11,12 @@
   </ul>
 </template>
 
-<script>
+<script setup>
 import getAuthors from '../../composables/getAuthors'
 
-export default {
-  name: 'AuthorList',
-  setup () {
-    const { authors, error, load } = getAuthors()
+const { authors, error, load } = getAuthors()
 
-    load()
-
-    return { authors, error }
-  }
-}
+load()
 </script>
 
 <style scoped>
