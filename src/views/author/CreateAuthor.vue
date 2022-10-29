@@ -24,41 +24,36 @@
   </form>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-export default {
-  setup () {
-    const firstName = ref('')
-    const familyName = ref('')
-    const birthDate = ref(null)
-    const deathDate = ref(null)
-    const error = ref(null)
+const firstName = ref('')
+const familyName = ref('')
+const birthDate = ref(null)
+const deathDate = ref(null)
+const error = ref(null)
 
-    const router = useRouter()
+const router = useRouter()
 
-    const handleSubmit = async () => {
-      const author = {
-        firstName: firstName.value,
-        familyName: familyName.value,
-        birthDate: birthDate.value,
-        deathDate: deathDate.value
-      }
-      console.log(author)
-      try {
-        await fetch('http://localhost:3000/authors',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(author)
-          })
-        router.push('/authors') // redirect to author list
-      } catch (err) {
-        error.value = err.message
-      }
-    }
-    return { firstName, familyName, birthDate, deathDate, error, handleSubmit }
+const handleSubmit = async () => {
+  const author = {
+    firstName: firstName.value,
+    familyName: familyName.value,
+    birthDate: birthDate.value,
+    deathDate: deathDate.value
+  }
+  console.log(author)
+  try {
+    await fetch('http://localhost:3000/authors',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(author)
+      })
+    router.push('/authors') // redirect to author list
+  } catch (err) {
+    error.value = err.message
   }
 }
 </script>
