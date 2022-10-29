@@ -1,5 +1,6 @@
 <template>
   <h1>Update Author</h1>
+  <div v-if="error">{{ error }}</div>
   <div v-if="firstName">
     <form @submit.prevent="handleSubmit">
       <div>
@@ -28,50 +29,51 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'UpdateAuthor',
-  props: ['id'],
-  data () {
-    return {
-      firstName: '',
-      familyName: '',
-      birthDate: null,
-      deathDate: null,
-      uri: 'http://localhost:3000/authors/' + this.id
-    }
-  },
-  mounted () {
-    fetch(this.uri)
-      .then(resp => resp.json())
-      .then(data => {
-        this.firstName = data.firstName
-        this.familyName = data.familyName
-        this.birthDate = data.birthDate
-        this.deathDate = data.deathDate
-      })
-      .catch(err => console.log(err))
-  },
-  methods: {
-    async handleSubmit () {
-      const author = {
-        firstName: this.firstName,
-        familyName: this.familyName,
-        birthDate: this.birthDate,
-        deathDate: this.deathDate
-      }
-      console.log(author)
-      try {
-        await fetch(this.uri, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(author)
-        })
-        this.$router.push('/authors') // redirect to author list
-      } catch (err) {
-        console.log(err)
-      }
-    }
+<script setup>
+import { ref, defineProps, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const props = defineProps(['id'])
+const router = useRouter()
+
+const firstName = ref('')
+const familyName = ref('')
+const birthDate = ref(null)
+const deathDate = ref(null)
+const error = ref(null)
+
+const uri = 'http://localhost:3000/authors/' + props.id
+
+onMounted(async () => {
+  try {
+    const resp = await fetch(uri)
+    const data = await resp.json()
+    firstName.value = data.firstName
+    familyName.value = data.familyName
+    birthDate.value = data.birthDate
+    deathDate.value = data.deathDate
+  } catch (err) {
+    error.value = err.message
+  }
+})
+
+const handleSubmit = async () => {
+  const author = {
+    firstName: firstName.value,
+    familyName: familyName.value,
+    birthDate: birthDate.value,
+    deathDate: deathDate.value
+  }
+  console.log(author)
+  try {
+    await fetch(uri, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(author)
+    })
+    router.push('/authors') // redirect to author list
+  } catch (err) {
+    error.value = err.message
   }
 }
 </script>
