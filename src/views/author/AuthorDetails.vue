@@ -33,38 +33,33 @@
   </div>
 </template>
 
-<script>
-
-import { useRoute, useRouter } from 'vue-router'
+<script setup>
+import { defineProps } from 'vue'
+import { useRouter } from 'vue-router'
 import getAuthor from '../../composables/getAuthor'
 
-export default {
-  props: ['id'],
-  setup (props) {
-    const route = useRoute()
-    const id = route.params.id
-    const uri = 'http://localhost:3000/authors/' + id
+const props = defineProps(['id'])
 
-    const { error, loaded, author, books, load } = getAuthor(id, uri)
+// const route = useRoute()
+// const id = route.params.id
+const uri = 'http://localhost:3000/authors/' + props.id
 
-    const router = useRouter()
+const { error, loaded, author, books, load } = getAuthor(props.id, uri)
 
-    const deleteAuthor = async () => {
-      if (confirm('Do you really want to delete this Author?')) {
-        try {
-          await fetch(uri, { method: 'DELETE' })
-          router.push('/authors') // redirect to author list
-        } catch (err) {
-          error.value = err.message
-        }
-      }
+const router = useRouter()
+
+const deleteAuthor = async () => {
+  if (confirm('Do you really want to delete this Author?')) {
+    try {
+      await fetch(uri, { method: 'DELETE' })
+      router.push('/authors') // redirect to author list
+    } catch (err) {
+      error.value = err.message
     }
-
-    load()
-
-    return { error, loaded, author, books, deleteAuthor }
   }
 }
+
+load()
 </script>
 
 <style scoped>
