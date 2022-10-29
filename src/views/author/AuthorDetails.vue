@@ -55,7 +55,7 @@ export default {
           await fetch(uri, { method: 'DELETE' })
           router.push('/authors') // redirect to author list
         } catch (err) {
-          console.log(err)
+          error.value = err.message
         }
       }
     }

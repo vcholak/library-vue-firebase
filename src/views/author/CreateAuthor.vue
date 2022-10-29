@@ -1,5 +1,6 @@
 <template>
   <h1>Create Author</h1>
+  <div v-if="error">{{ error }}</div>
   <form @submit.prevent="handleSubmit">
     <div>
       <label>First Name:</label>
@@ -24,22 +25,25 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
 export default {
-  data () {
-    return {
-      firstName: '',
-      familyName: '',
-      birthDate: null,
-      deathDate: null
-    }
-  },
-  methods: {
-    async handleSubmit () {
+  setup () {
+    const firstName = ref('')
+    const familyName = ref('')
+    const birthDate = ref(null)
+    const deathDate = ref(null)
+    const error = ref(null)
+
+    const router = useRouter()
+
+    const handleSubmit = async () => {
       const author = {
-        firstName: this.firstName,
-        familyName: this.familyName,
-        birthDate: this.birthDate,
-        deathDate: this.deathDate
+        firstName: firstName.value,
+        familyName: familyName.value,
+        birthDate: birthDate.value,
+        deathDate: deathDate.value
       }
       console.log(author)
       try {
@@ -49,11 +53,12 @@ export default {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(author)
           })
-        this.$router.push('/authors') // redirect to author list
+        router.push('/authors') // redirect to author list
       } catch (err) {
-        console.log(err)
+        error.value = err.message
       }
     }
+    return { firstName, familyName, birthDate, deathDate, error, handleSubmit }
   }
 }
 </script>

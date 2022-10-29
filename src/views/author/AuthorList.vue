@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error">{{ error }}</div>
   <h1>Author List</h1>
   <div>
     <router-link to="/authors/create">Create Author</router-link>
