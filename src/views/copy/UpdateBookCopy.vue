@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error">{{ error }}</div>
   <div v-if="loaded">
     <h1>Update Book Copy</h1>
     <form @submit.prevent="handleSubmit">
@@ -32,61 +33,61 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['id'],
-  data () {
-    return {
-      loaded: false,
-      uri: 'http://localhost:3000/copies/' + this.id,
-      booksUri: 'http://localhost:3000/books',
-      books: [],
-      bookId: null,
-      bookTitle: '',
-      imprint: '',
-      availableDate: null,
-      status: '',
-      statuses: ['Maintenance', 'Available', 'Loaned', 'Reserved']
-    }
-  },
-  async mounted () {
-    try {
-      const resp = await Promise.all([fetch(this.uri), fetch(this.booksUri)])
-      const data = await Promise.all(resp.map(e => e.json()))
-      const copy = data[0]
-      this.bookId = copy.bookId
-      this.bookTitle = copy.bookTitle
-      this.imprint = copy.imprint
-      this.availableDate = copy.availableDate
-      this.status = copy.status
-      this.books = data[1]
-      this.loaded = true
-    } catch (err) {
-      console.log(err)
-    }
-  },
-  methods: {
-    async handleSubmit () {
-      const bookCopy = {
-        bookId: this.bookId,
-        bookTitle: this.books.find(e => e.id === this.bookId).title,
-        imprint: this.imprint,
-        availableDate: this.availableDate,
-        status: this.status
-      }
-      try {
-        await fetch(this.uri, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bookCopy)
-        })
-        this.$router.push('/copies') // redirect to book copy list
-      } catch (err) {
-        console.log(err)
-      }
-    }
-  }
+<script setup>
+import { ref, defineProps, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const props = defineProps(['id'])
+const router = useRouter()
+
+const loaded = ref(false)
+const books = ref([])
+const bookId = ref(null)
+const bookTitle = ref('')
+const imprint = ref('')
+const availableDate = ref(null)
+const status = ref('')
+const statuses = ref(['Maintenance', 'Available', 'Loaned', 'Reserved'])
+const error = ref(null)
+
+const uri = 'http://localhost:3000/copies/' + props.id
+const booksUri = 'http://localhost:3000/books'
+
+onMounted(async () => {
+  try {
+    const resp = await Promise.all([fetch(uri), fetch(booksUri)])
+    const data = await Promise.all(resp.map(e => e.json()))
+    const copy = data[0]
+    bookId.value = copy.bookId
+    bookTitle.value = copy.bookTitle
+    imprint.value = copy.imprint
+    availableDate.value = copy.availableDate
+    status.value = copy.status
+    books.value = data[1]
+    loaded.value = true
+  } catch (err) {
+    error.value = err.message
+  }
+})
+
+const handleSubmit = async () => {
+  const bookCopy = {
+    bookId: bookId.value,
+    bookTitle: books.value.find(e => e.id === bookId.value).title,
+    imprint: imprint.value,
+    availableDate: availableDate.value,
+    status: status.value
+  }
+  try {
+    await fetch(uri, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookCopy)
+    })
+    router.push('/copies') // redirect to book copy list
+  } catch (err) {
+    error.value = err.message
+  }
 }
 </script>
 
