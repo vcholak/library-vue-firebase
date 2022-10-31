@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error">{{ error }}</div>
   <div v-if="loaded">
     <h1>Title: {{book.title}}</h1>
     <p>
@@ -45,48 +46,47 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['id'],
-  data () {
-    return {
-      loaded: false,
-      book: null,
-      bookUri: 'http://localhost:3000/books/' + this.id,
-      author: null,
-      genres: [],
-      genresUri: 'http://localhost:3000/genres/',
-      copies: [],
-      copiesUri: 'http://localhost:3000/copies'
-    }
-  },
-  async mounted () {
+<script setup>
+import { ref, defineProps, onMounted } from 'vue'
+
+const props = defineProps(['id'])
+
+const loaded = ref(false)
+const book = ref(null)
+const author = ref(null)
+const genres = ref([])
+const copies = ref([])
+const error = ref(null)
+
+const bookUri = 'http://localhost:3000/books/' + props.id
+const genresUri = 'http://localhost:3000/genres/'
+const copiesUri = 'http://localhost:3000/copies'
+
+onMounted(async () => {
+  try {
+    const resp = await fetch(bookUri)
+    const book = await resp.json()
+    book.value = book
+    const authorUri = 'http://localhost:3000/authors/' + book.authorId
+    const genreIds = book.genreIds
+    const resp2 = await Promise.all([fetch(authorUri), fetch(genresUri), fetch(copiesUri)])
+    const data = await Promise.all(resp2.map(e => e.json()))
+    author.value = data[0]
+    genres.value = data[1].filter(e => genreIds.includes(e.id))
+    copies.value = data[2].filter(c => c.bookId === this.book.id)
+    loaded.value = true
+  } catch (err) {
+    error.value = err.message
+  }
+})
+
+const deleteBook = async () => {
+  if (confirm('Do you really want to delete this Book?')) {
     try {
-      const resp = await fetch(this.bookUri)
-      const book = await resp.json()
-      this.book = book
-      const authorUri = 'http://localhost:3000/authors/' + book.authorId
-      const genreIds = book.genreIds
-      const resp2 = await Promise.all([fetch(authorUri), fetch(this.genresUri), fetch(this.copiesUri)])
-      const data = await Promise.all(resp2.map(e => e.json()))
-      this.author = data[0]
-      this.genres = data[1].filter(e => genreIds.includes(e.id))
-      this.copies = data[2].filter(c => c.bookId === this.book.id)
-      this.loaded = true
+      await fetch(this.bookUri, { method: 'DELETE' })
+      this.$router.push('/books') // redirect to book list
     } catch (err) {
       console.log(err)
-    }
-  },
-  methods: {
-    async deleteBook () {
-      if (confirm('Do you really want to delete this Book?')) {
-        try {
-          await fetch(this.bookUri, { method: 'DELETE' })
-          this.$router.push('/books') // redirect to book list
-        } catch (err) {
-          console.log(err)
-        }
-      }
     }
   }
 }
