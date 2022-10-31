@@ -65,15 +65,15 @@ const copiesUri = 'http://localhost:3000/copies'
 onMounted(async () => {
   try {
     const resp = await fetch(bookUri)
-    const book = await resp.json()
-    book.value = book
-    const authorUri = 'http://localhost:3000/authors/' + book.authorId
-    const genreIds = book.genreIds
+    const bookData = await resp.json()
+    book.value = bookData
+    const authorUri = 'http://localhost:3000/authors/' + bookData.authorId
+    const genreIds = bookData.genreIds
     const resp2 = await Promise.all([fetch(authorUri), fetch(genresUri), fetch(copiesUri)])
     const data = await Promise.all(resp2.map(e => e.json()))
     author.value = data[0]
     genres.value = data[1].filter(e => genreIds.includes(e.id))
-    copies.value = data[2].filter(c => c.bookId === this.book.id)
+    copies.value = data[2].filter(c => c.bookId === bookData.id)
     loaded.value = true
   } catch (err) {
     error.value = err.message
