@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error">{{ error }}</div>
   <div v-if="books.length">
     <h1>Create Book Copy</h1>
     <form @submit.prevent="handleSubmit">
@@ -32,51 +33,50 @@
   </div>
 </template>
 
-<script>
-export default {
-  data () {
-    return {
-      uri: 'http://localhost:3000/books',
-      books: [],
-      bookId: null,
-      bookTitle: '',
-      imprint: '',
-      availableDate: null,
-      status: '',
-      statuses: ['Maintenance', 'Available', 'Loaned', 'Reserved']
-    }
-  },
-  async mounted () {
-    try {
-      const resp = await fetch(this.uri)
-      const data = await resp.json()
-      this.books = data
-    } catch (err) {
-      console.log(err)
-    }
-  },
-  methods: {
-    async handleSubmit () {
-      const bookCopy = {
-        bookId: this.bookId,
-        bookTitle: this.books.find(e => e.id === this.bookId).title,
-        imprint: this.imprint,
-        availableDate: this.availableDate,
-        status: this.status
-      }
-      try {
-        await fetch('http://localhost:3000/copies', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(bookCopy)
-        })
-        this.$router.push('/copies') // redirect to book copy list
-      } catch (err) {
-        console.log(err)
-      }
-    }
-  }
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
+
+const books = ref([])
+const bookId = ref(null)
+const imprint = ref('')
+const availableDate = ref(null)
+const status = ref('')
+const statuses = ref(['Maintenance', 'Available', 'Loaned', 'Reserved'])
+const error = ref(null)
+
+const uri = 'http://localhost:3000/books'
+
+onMounted(async () => {
+  try {
+    const resp = await fetch(uri)
+    const data = await resp.json()
+    books.value = data
+  } catch (err) {
+    error.value = err.message
+  }
+})
+
+const handleSubmit = async () => {
+  const bookCopy = {
+    bookId: bookId.value,
+    bookTitle: books.value.find(e => e.id === bookId.value).title,
+    imprint: imprint.value,
+    availableDate: availableDate.value,
+    status: status.value
+  }
+  try {
+    await fetch('http://localhost:3000/copies', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookCopy)
+    })
+    router.push('/copies') // redirect to book copy list
+  } catch (err) {
+    error.value = err.message
+  }
 }
 </script>
 
