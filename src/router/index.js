@@ -7,6 +7,7 @@ import UpdateAuthor from '../views/author/UpdateAuthor'
 import GenreList from '../views/genre/GenreList'
 import CreateGenre from '../views/genre/CreateGenre'
 import GenreDetails from '../views/genre/GenreDetails'
+import UpdateGenre from '../views/genre/UpdateGenre'
 import BookList from '../views/book/BookList'
 import CreateBook from '../views/book/CreateBook'
 import BookDetails from '../views/book/BookDetails'
@@ -58,6 +59,12 @@ const routes = [
     path: '/genres/:id',
     name: 'GenreDetails',
     component: GenreDetails,
+    props: true
+  },
+  {
+    path: '/genres/:id',
+    name: 'UpdateGenre',
+    component: UpdateGenre,
     props: true
   },
   {

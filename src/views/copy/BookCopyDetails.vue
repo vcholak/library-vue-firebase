@@ -2,18 +2,18 @@
   <div v-if="error">{{ error }}</div>
   <div v-if="copy">
     <h1>Book Copy Details</h1>
-      <p>
-        <strong>Title: </strong>
-        <router-link :to="{name: 'BookDetails', params: {id: copy.bookId}}">{{ copy.bookTitle}}</router-link>
-      </p>
-      <p>
-        <strong>Imprint: </strong>{{copy.imprint}}
-      </p>
-      <p>
-        <strong>Status: </strong>{{copy.status}}
-      </p>
-      <hr>
-      <button>
+    <p>
+      <strong>Title: </strong>
+      <router-link :to="{name: 'BookDetails', params: {id: copy.bookId}}">{{ copy.bookTitle}}</router-link>
+    </p>
+    <p>
+      <strong>Imprint: </strong>{{copy.imprint}}
+    </p>
+    <p>
+      <strong>Status: </strong>{{copy.status}}
+    </p>
+    <hr>
+    <button>
       <router-link :to="{name: 'UpdateBookCopy', params: {id: copy.id}}">Update</router-link>
     </button>
     <button @click="deleteBookCopy">Delete</button>
