@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error">{{ error }}</div>
   <div v-if="loaded">
     <h1>Update Book</h1>
     <form @submit.prevent="handleSubmit">
@@ -40,62 +41,63 @@
   <p>Selected genre Ids: {{genreIds}}</p>
 </template>
 
-<script>
-export default {
-  props: ['id'],
-  data () {
-    return {
-      loaded: false,
-      bookUri: 'http://localhost:3000/books/' + this.id,
-      authors: [],
-      authorsUri: 'http://localhost:3000/authors',
-      genres: [],
-      genresUri: 'http://localhost:3000/genres',
-      title: '',
-      authorId: null,
-      summary: '',
-      isbn: '',
-      genreIds: []
-    }
-  },
-  async mounted () {
-    try {
-      const resp = await fetch(this.bookUri)
-      const book = await resp.json()
-      console.log(book)
-      this.title = book.title
-      this.authorId = book.authorId
-      this.summary = book.summary
-      this.isbn = book.isbn
-      this.genreIds = book.genreIds
-      const resp2 = await Promise.all([fetch(this.authorsUri), fetch(this.genresUri)])
-      const data = await Promise.all(resp2.map(e => e.json()))
-      console.log(data)
-      this.authors = data[0]
-      this.genres = data[1]
-      this.loaded = true
-    } catch (err) {
-      console.log(err)
-    }
-  },
-  methods: {
-    handleSubmit () {
-      const book = {
-        title: this.title,
-        authorId: this.authorId,
-        summary: this.summary,
-        isbn: this.isbn,
-        genreIds: this.genreIds
-      }
-      console.log(book)
-      fetch(this.bookUri, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(book)
-      }).then(() => {
-        this.$router.push('/books') // redirect to book list
-      }).catch(err => console.log(err))
-    }
+<script setup>
+import { ref, defineProps, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const props = defineProps(['id'])
+const router = useRouter()
+
+const loaded = ref(false)
+const authors = ref([])
+const genres = ref([])
+const title = ref('')
+const authorId = ref(null)
+const summary = ref('')
+const isbn = ref('')
+const genreIds = ref([])
+const error = ref(null)
+
+const bookUri = 'http://localhost:3000/books/' + props.id
+const authorsUri = 'http://localhost:3000/authors'
+const genresUri = 'http://localhost:3000/genres'
+
+onMounted(async () => {
+  try {
+    const resp = await fetch(bookUri)
+    const book = await resp.json()
+    title.value = book.title
+    authorId.value = book.authorId
+    summary.value = book.summary
+    isbn.value = book.isbn
+    genreIds.value = book.genreIds
+    const resp2 = await Promise.all([fetch(authorsUri), fetch(genresUri)])
+    const data = await Promise.all(resp2.map(e => e.json()))
+    authors.value = data[0]
+    genres.value = data[1]
+    loaded.value = true
+  } catch (err) {
+    error.value = err.message
+  }
+})
+
+const handleSubmit = async () => {
+  const book = {
+    title: title.value,
+    authorId: authorId.value,
+    summary: summary.value,
+    isbn: isbn.value,
+    genreIds: genreIds.value
+  }
+  try {
+    await fetch(bookUri, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(book)
+    })
+    router.push('/books') // redirect to book list
+  } catch (err) {
+    error.value = err.message
   }
 }
 </script>
