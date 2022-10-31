@@ -1,10 +1,21 @@
 <template>
   <div v-if="error">{{ error }}</div>
-  <div v-if="genre">
+  <div v-if="loaded">
     <h1>Genre: {{genre.name}}</h1>
     <div style="margin-left:20px;margin-top:20px">
       <h4>Books</h4>
-      <div>TODO</div>
+      <div v-if="books.length">
+        <dl>
+          <div v-for="book in books" :key="book.id">
+            <dt>
+              <router-link :to="{name: 'BookDetails', params: {id: book.id}}">{{book.title}}</router-link>
+            </dt>
+          </div>
+        </dl>
+      </div>
+      <div v-else>
+        <span>This genre has no books</span>
+      </div>
     </div>
     <hr>
     <button>
@@ -25,15 +36,24 @@ const props = defineProps(['id'])
 const router = useRouter()
 
 const genre = ref(null)
+const books = ref([])
+const loaded = ref(false)
 const error = ref(null)
 
 const uri = 'http://localhost:3000/genres/' + props.id
+const booksUri = 'http://localhost:3000/books'
 
 onMounted(async () => {
   try {
     const resp = await fetch(uri)
     const data = await resp.json()
+    console.log(data)
     genre.value = data
+    const resp2 = await fetch(booksUri)
+    const allBooks = await resp2.json()
+    console.log(allBooks)
+    books.value = allBooks.filter(b => b.genreIds.includes(data.id))
+    loaded.value = true
   } catch (err) {
     error.value = err.message
   }
