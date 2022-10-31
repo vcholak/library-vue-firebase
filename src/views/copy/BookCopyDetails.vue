@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error">{{ error }}</div>
   <div v-if="copy">
     <h1>Book Copy Details</h1>
       <p>
@@ -22,34 +23,35 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ['id'],
-  data () {
-    return {
-      uri: 'http://localhost:3000/copies/' + this.id,
-      copy: null
-    }
-  },
-  async mounted () {
+<script setup>
+import { ref, defineProps, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const props = defineProps(['id'])
+const router = useRouter()
+
+const copy = ref(null)
+const error = ref(null)
+
+const uri = 'http://localhost:3000/copies/' + props.id
+
+onMounted(async () => {
+  try {
+    const resp = await fetch(uri)
+    const data = await resp.json()
+    copy.value = data
+  } catch (err) {
+    error.value = err.message
+  }
+})
+
+const deleteBookCopy = async () => {
+  if (confirm('Do you really want to delete this book copy?')) {
     try {
-      const resp = await fetch(this.uri)
-      const data = await resp.json()
-      this.copy = data
+      await fetch(uri, { method: 'DELETE' })
+      router.push('/copies') // redirect to book copy list
     } catch (err) {
-      console.log(err)
-    }
-  },
-  methods: {
-    async deleteBookCopy () {
-      if (confirm('Do you really want to delete this book copy?')) {
-        try {
-          await fetch(this.uri, { method: 'DELETE' })
-          this.$router.push('/copies') // redirect to book copy list
-        } catch (err) {
-          console.log(err)
-        }
-      }
+      error.value = err.message
     }
   }
 }
