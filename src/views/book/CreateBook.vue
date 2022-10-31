@@ -1,4 +1,5 @@
 <template>
+  <div v-if="error">{{ error }}</div>
   <div v-if="authors.length && genres.length">
     <h1>Create Book</h1>
     <form @submit.prevent="handleSubmit">
@@ -39,54 +40,52 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'CreateBook',
-  data () {
-    return {
-      authors: [],
-      authorsUri: 'http://localhost:3000/authors',
-      genres: [],
-      genresUri: 'http://localhost:3000/genres',
-      title: '',
-      authorId: null,
-      summary: '',
-      isbn: '',
-      genreIds: []
-    }
-  },
-  async mounted () {
-    try {
-      const resp = await Promise.all([fetch(this.authorsUri), fetch(this.genresUri)])
-      const data = await Promise.all(resp.map(e => e.json()))
-      console.log(data)
-      this.authors = data[0]
-      this.genres = data[1]
-    } catch (err) {
-      console.log(err)
-    }
-  },
-  methods: {
-    async handleSubmit () {
-      const book = {
-        title: this.title,
-        authorId: this.authorId,
-        summary: this.summary,
-        isbn: this.isbn,
-        genreIds: this.genreIds
-      }
-      console.log(book)
-      try {
-        await fetch('http://localhost:3000/books', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(book)
-        })
-        this.$router.push('/books') // redirect to book list
-      } catch (err) {
-        console.log(err)
-      }
-    }
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const authors = ref([])
+const genres = ref([])
+const title = ref('')
+const authorId = ref(null)
+const summary = ref('')
+const isbn = ref('')
+const genreIds = ref([])
+const error = ref(null)
+
+const authorsUri = 'http://localhost:3000/authors'
+const genresUri = 'http://localhost:3000/genres'
+
+onMounted(async () => {
+  try {
+    const resp = await Promise.all([fetch(authorsUri), fetch(genresUri)])
+    const data = await Promise.all(resp.map(e => e.json()))
+    authors.value = data[0]
+    genres.value = data[1]
+  } catch (err) {
+    error.value = err.message
+  }
+})
+
+const handleSubmit = async () => {
+  const book = {
+    title: title.value,
+    authorId: authorId.value,
+    summary: summary.value,
+    isbn: isbn.value,
+    genreIds: genreIds.value
+  }
+  try {
+    await fetch('http://localhost:3000/books', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(book)
+    })
+    router.push('/books') // redirect to book list
+  } catch (err) {
+    error.value = err.message
   }
 }
 </script>
