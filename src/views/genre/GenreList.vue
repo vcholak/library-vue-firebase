@@ -3,6 +3,7 @@
   <div>
     <router-link to="/genres/create">Create Genre</router-link>
   </div>
+  <div v-if="error">{{ error }}</div>
   <div>
     <ul>
       <li v-for="genre in genres" :key="genre.id">
@@ -12,25 +13,23 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'GenreList',
-  data () {
-    return {
-      genres: [],
-      uri: 'http://localhost:3000/genres'
-    }
-  },
-  async mounted () {
-    try {
-      const resp = await fetch(this.uri)
-      const data = await resp.json()
-      this.genres = data
-    } catch (err) {
-      console.log(err)
-    }
+<script setup>
+import { ref, onMounted } from 'vue'
+import { firestore } from '../../firebase/config'
+
+const genres = ref([])
+const error = ref(null)
+
+onMounted(async () => {
+  try {
+    const data = await firestore.collection('genres').get()
+    genres.value = data.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
+  } catch (err) {
+    error.value = err.message
   }
-}
+})
 </script>
 
 <style scoped>
