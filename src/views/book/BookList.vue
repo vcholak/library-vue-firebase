@@ -13,17 +13,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { firestore } from '../../firebase/config'
 
 const books = ref([])
 const error = ref(null)
 
-const uri = 'http://localhost:3000/books'
-
 onMounted(async () => {
   try {
-    const resp = await fetch(uri)
-    const data = await resp.json()
-    books.value = data
+    const data = await firestore.collection('books').get()
+    books.value = data.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
   } catch (err) {
     error.value = err.message
   }
