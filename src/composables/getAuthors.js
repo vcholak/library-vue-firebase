@@ -1,16 +1,16 @@
 import { ref } from 'vue'
+import { firestore } from '../../firebase/config'
 
 const getAuthors = () => {
-  const uri = 'http://localhost:3000/authors'
-
   const authors = ref([])
   const error = ref(null)
 
   const load = async () => {
     try {
-      const resp = await fetch(uri)
-      const data = await resp.json()
-      authors.value = data
+      const data = await firestore.collection('authors').get()
+      authors.value = data.docs.map(doc => {
+        return { ...doc.data(), id: doc.id }
+      })
     } catch (err) {
       error.value = err.message
     }
