@@ -15,6 +15,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
 const router = useRouter()
 
@@ -23,11 +24,7 @@ const error = ref(null)
 
 const handleSubmit = async () => {
   try {
-    await fetch('http://localhost:3000/genres', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.value })
-    })
+    await db.collection('genres').add({ name: name.value })
     router.push('/genres') // redirect to genre list
   } catch (err) {
     console.log(err)
