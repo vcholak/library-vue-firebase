@@ -22,14 +22,15 @@ const error = ref(null)
 onMounted(async () => {
   try {
     const data = await db.collection('copies').get()
-    // console.log(data)
-    copies.value = data.docs.map(doc => {
-      console.log(doc.data().book.get())
-      // const ref = doc.book
-      const book = doc.data().book.get()
-      return { ...doc.data(), id: doc.id, title: book.title }
+    const resp = await db.collection('books').get()
+    const books = resp.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
     })
-    // console.log(copies.value)
+    copies.value = data.docs.map(doc => {
+      const d = doc.data()
+      const book = books.find(b => b.id === d.bookId)
+      return { ...d, id: doc.id, title: book.title }
+    })
   } catch (err) {
     error.value = err.message
   }
