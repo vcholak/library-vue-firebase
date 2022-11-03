@@ -36,6 +36,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config';
 
 const router = useRouter()
 
@@ -47,13 +48,12 @@ const status = ref('')
 const statuses = ref(['Maintenance', 'Available', 'Loaned', 'Reserved'])
 const error = ref(null)
 
-const uri = 'http://localhost:3000/books'
-
 onMounted(async () => {
   try {
-    const resp = await fetch(uri)
-    const data = await resp.json()
-    books.value = data
+    const data = await db.collection('books').get()
+    books.value = data.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
   } catch (err) {
     error.value = err.message
   }
@@ -68,11 +68,7 @@ const handleSubmit = async () => {
     status: status.value
   }
   try {
-    await fetch('http://localhost:3000/copies', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(bookCopy)
-    })
+    await db.collection('copies').add(bookCopy)
     router.push('/copies') // redirect to book copy list
   } catch (err) {
     error.value = err.message
