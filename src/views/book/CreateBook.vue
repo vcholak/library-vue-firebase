@@ -43,6 +43,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
 const router = useRouter()
 
@@ -55,15 +56,16 @@ const isbn = ref('')
 const genreIds = ref([])
 const error = ref(null)
 
-const authorsUri = 'http://localhost:3000/authors'
-const genresUri = 'http://localhost:3000/genres'
-
 onMounted(async () => {
   try {
-    const resp = await Promise.all([fetch(authorsUri), fetch(genresUri)])
-    const data = await Promise.all(resp.map(e => e.json()))
-    authors.value = data[0]
-    genres.value = data[1]
+    let data = await db.collection('authors').get()
+    authors.value = data.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
+    data = await db.collection('genres').get()
+    genres.value = data.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
   } catch (err) {
     error.value = err.message
   }
@@ -78,11 +80,7 @@ const handleSubmit = async () => {
     genreIds: genreIds.value
   }
   try {
-    await fetch('http://localhost:3000/books', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(book)
-    })
+    await db.collection('books').add(book)
     router.push('/books') // redirect to book list
   } catch (err) {
     error.value = err.message

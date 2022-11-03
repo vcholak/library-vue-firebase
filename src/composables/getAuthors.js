@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { firestore } from '../firebase/config'
+import { db } from '../firebase/config'
 
 const getAuthors = () => {
   const authors = ref([])
@@ -7,7 +7,7 @@ const getAuthors = () => {
 
   const load = async () => {
     try {
-      const data = await firestore.collection('authors').get()
+      const data = await db.collection('authors').get()
       authors.value = data.docs.map(doc => {
         return { ...doc.data(), id: doc.id }
       })

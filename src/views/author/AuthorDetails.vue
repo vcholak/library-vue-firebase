@@ -45,7 +45,7 @@ const router = useRouter()
 // const id = route.params.id
 const uri = 'http://localhost:3000/authors/' + props.id
 
-const { error, loaded, author, books, load } = getAuthor(props.id, uri)
+const { error, loaded, author, books, load } = getAuthor(props.id)
 
 const deleteAuthor = async () => {
   if (confirm('Do you really want to delete this Author?')) {

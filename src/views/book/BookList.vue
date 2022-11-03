@@ -13,14 +13,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { firestore } from '../../firebase/config'
+import { db } from '../../firebase/config'
 
 const books = ref([])
 const error = ref(null)
 
 onMounted(async () => {
   try {
-    const data = await firestore.collection('books').get()
+    const data = await db.collection('books').get()
     books.value = data.docs.map(doc => {
       return { ...doc.data(), id: doc.id }
     })

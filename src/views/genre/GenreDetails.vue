@@ -31,6 +31,7 @@
 <script setup>
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
 const props = defineProps(['id'])
 const router = useRouter()
@@ -45,14 +46,15 @@ const booksUri = 'http://localhost:3000/books'
 
 onMounted(async () => {
   try {
-    const resp = await fetch(uri)
-    const data = await resp.json()
-    console.log(data)
-    genre.value = data
+    const resp = await db.collection('genres').doc(props.id).get()
+    if (!resp.exists) {
+      throw new Error('No Genre found with ID=' + props.id)
+    }
+    genre.value = { ...resp.data(), id: resp.id }
     const resp2 = await fetch(booksUri)
     const allBooks = await resp2.json()
     console.log(allBooks)
-    books.value = allBooks.filter(b => b.genreIds.includes(data.id))
+    books.value = allBooks.filter(b => b.genreId === resp.id)
     loaded.value = true
   } catch (err) {
     error.value = err.message

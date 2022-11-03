@@ -27,6 +27,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
 const firstName = ref('')
 const familyName = ref('')
@@ -43,14 +44,9 @@ const handleSubmit = async () => {
     birthDate: birthDate.value,
     deathDate: deathDate.value
   }
-  console.log(author)
   try {
-    await fetch('http://localhost:3000/authors',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(author)
-      })
+    await db.collection('authors').add(author)
+
     router.push('/authors') // redirect to author list
   } catch (err) {
     error.value = err.message
