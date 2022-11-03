@@ -24,10 +24,9 @@
       <div>
         <label>Genre:</label>
         <div>
-          <div v-for="genre in genres" :key="genre.id" style="display: inline; padding-right:10px;">
-            <input type="checkbox" :value="genre.id" v-model="genreIds">
-            <label style="display: inline-block; vertical-align:middle; margin: 0 0 0.3rem;">{{genre.name}}</label>
-          </div>
+          <select v-model="genreId" required>
+            <option :value="genre.id" v-for="genre in genres" :key="genre.id">{{ genre.name}}</option>
+          </select>
         </div>
       </div>
       <div class="submit">
@@ -53,7 +52,7 @@ const title = ref('')
 const authorId = ref(null)
 const summary = ref('')
 const isbn = ref('')
-const genreIds = ref([])
+const genreId = ref(null)
 const error = ref(null)
 
 onMounted(async () => {
@@ -77,7 +76,7 @@ const handleSubmit = async () => {
     authorId: authorId.value,
     summary: summary.value,
     isbn: isbn.value,
-    genreIds: genreIds.value
+    genreId: genreId.value
   }
   try {
     await db.collection('books').add(book)
