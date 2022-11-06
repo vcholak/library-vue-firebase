@@ -58,16 +58,15 @@ const deleteAuthor = async () => {
   }
 }
 
-load()
-
 const birthDate = computed(() => {
-  return author.birthDate.toDate().toDateString()
+  return author.value.birthDate.toDate().toDateString()
 })
 
 const deathDate = computed(() => {
-  return author.deathDate.toDate().toDateString()
+  return author.value.deathDate.toDate().toDateString()
 })
 
+load()
 </script>
 
 <style scoped>

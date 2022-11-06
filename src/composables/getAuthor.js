@@ -24,7 +24,6 @@ const getAuthor = (id) => {
       error.value = err.message
     }
   }
-
   return { error, loaded, author, books, load }
 }
 

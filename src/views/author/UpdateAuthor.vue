@@ -32,6 +32,7 @@
 <script setup>
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
 const props = defineProps(['id'])
 const router = useRouter()
@@ -42,12 +43,9 @@ const birthDate = ref(null)
 const deathDate = ref(null)
 const error = ref(null)
 
-const uri = 'http://localhost:3000/authors/' + props.id
-
 onMounted(async () => {
   try {
-    const resp = await fetch(uri)
-    const data = await resp.json()
+    const data = await db.collection('authors').doc(props.id).get()
     firstName.value = data.firstName
     familyName.value = data.familyName
     birthDate.value = data.birthDate
@@ -64,13 +62,8 @@ const handleSubmit = async () => {
     birthDate: birthDate.value,
     deathDate: deathDate.value
   }
-  console.log(author)
   try {
-    await fetch(uri, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(author)
-    })
+    await db.collection('authors').doc(props.id).update(author)
     router.push('/authors') // redirect to author list
   } catch (err) {
     error.value = err.message
