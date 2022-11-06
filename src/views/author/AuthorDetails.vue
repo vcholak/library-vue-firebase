@@ -2,8 +2,8 @@
   <div v-if="error">{{ error }}</div>
   <div v-if="loaded">
     <h1>Author: {{author.familyName}}, {{author.firstName}}</h1>
-    <p>{{author.birthDate}} -
-      <span v-if="author.deathDate">{{author.deathDate}}</span>
+    <p>{{birthDate}} -
+      <span v-if="author.deathDate">{{deathDate}}</span>
       <span v-else>Alive</span>
     </p>
     <div style="margin-left:20px;margin-top:20px">
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
+import { defineProps, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import getAuthor from '../../composables/getAuthor'
 import { db } from '../../firebase/config'
@@ -59,6 +59,15 @@ const deleteAuthor = async () => {
 }
 
 load()
+
+const birthDate = computed(() => {
+  return author.birthDate.toDate().toDateString()
+})
+
+const deathDate = computed(() => {
+  return author.deathDate.toDate().toDateString()
+})
+
 </script>
 
 <style scoped>
