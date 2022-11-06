@@ -18,7 +18,7 @@ const getAuthor = (id) => {
       const allBooks = booksResp.docs.map(doc => {
         return { ...doc.data(), id: doc.id }
       })
-      books.value = allBooks.filter(b => db.doc(b.author.id) === Number(id)) // FIXME b.author.id
+      books.value = allBooks.filter(b => b.authorId === id)
       loaded.value = true
     } catch (err) {
       error.value = err.message
