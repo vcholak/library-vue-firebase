@@ -27,9 +27,9 @@ onMounted(async () => {
       return { ...doc.data(), id: doc.id }
     })
     copies.value = data.docs.map(doc => {
-      const d = doc.data()
-      const book = books.find(b => b.id === d.bookId)
-      return { ...d, id: doc.id, title: book.title }
+      const data = doc.data()
+      const book = books.find(b => b.id === data.bookId)
+      return { ...data, id: doc.id, title: book.title }
     })
   } catch (err) {
     error.value = err.message

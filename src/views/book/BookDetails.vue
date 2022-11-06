@@ -48,8 +48,11 @@
 
 <script setup>
 import { ref, defineProps, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
 const props = defineProps(['id'])
+const router = useRouter()
 
 const loaded = ref(false)
 const book = ref(null)
@@ -58,14 +61,12 @@ const genres = ref([])
 const copies = ref([])
 const error = ref(null)
 
-const bookUri = 'http://localhost:3000/books/' + props.id
 const genresUri = 'http://localhost:3000/genres/'
 const copiesUri = 'http://localhost:3000/copies'
 
 onMounted(async () => {
   try {
-    const resp = await fetch(bookUri)
-    const bookData = await resp.json()
+    const bookData = await db.collection('books').doc(props.id).get()
     book.value = bookData
     const authorUri = 'http://localhost:3000/authors/' + bookData.authorId
     const genreIds = bookData.genreIds
@@ -83,8 +84,8 @@ onMounted(async () => {
 const deleteBook = async () => {
   if (confirm('Do you really want to delete this Book?')) {
     try {
-      await fetch(this.bookUri, { method: 'DELETE' })
-      this.$router.push('/books') // redirect to book list
+      await db.collection('books').doc(props.id).delete()
+      router.push('/books') // redirect to book list
     } catch (err) {
       console.log(err)
     }

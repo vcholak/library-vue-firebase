@@ -37,20 +37,20 @@
 import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import getAuthor from '../../composables/getAuthor'
+import { db } from '../../firebase/config'
 
 const props = defineProps(['id'])
 const router = useRouter()
 
 // const route = useRoute()
 // const id = route.params.id
-const uri = 'http://localhost:3000/authors/' + props.id
 
 const { error, loaded, author, books, load } = getAuthor(props.id)
 
 const deleteAuthor = async () => {
   if (confirm('Do you really want to delete this Author?')) {
     try {
-      await fetch(uri, { method: 'DELETE' })
+      await db.collection('authors').doc(props.id).delete()
       router.push('/authors') // redirect to author list
     } catch (err) {
       error.value = err.message
