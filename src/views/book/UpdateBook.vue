@@ -23,12 +23,9 @@
       </div>
       <div>
         <label>Genre:</label>
-        <div>
-          <div v-for="genre in genres" :key="genre.id" style="display: inline; padding-right:10px;">
-            <input type="checkbox" :value="genre.id" v-model="genreIds" style="display: inline;">
-            <label style="display: inline;">{{genre.name}}</label>
-          </div>
-        </div>
+        <select v-model="genreId" required>
+          <option :value="genre.id" v-for="genre in genres" :key="genre.id">{{ genre.name}}</option>
+        </select>
       </div>
       <div class="submit">
         <button>Update</button>
@@ -38,12 +35,12 @@
   <div v-else>
     <p>Loading Data ...</p>
   </div>
-  <p>Selected genre Ids: {{genreIds}}</p>
 </template>
 
 <script setup>
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
 const props = defineProps(['id'])
 const router = useRouter()
@@ -55,26 +52,29 @@ const title = ref('')
 const authorId = ref(null)
 const summary = ref('')
 const isbn = ref('')
-const genreIds = ref([])
+const genreId = ref(null)
 const error = ref(null)
-
-const bookUri = 'http://localhost:3000/books/' + props.id
-const authorsUri = 'http://localhost:3000/authors'
-const genresUri = 'http://localhost:3000/genres'
 
 onMounted(async () => {
   try {
-    const resp = await fetch(bookUri)
-    const book = await resp.json()
+    let resp = await db.collection('books').doc(props.id).get()
+    if (!resp.exists) {
+      throw new Error('No Book found with ID=' + props.id)
+    }
+    const book = { ...resp.data(), id: resp.id }
     title.value = book.title
     authorId.value = book.authorId
     summary.value = book.summary
     isbn.value = book.isbn
-    genreIds.value = book.genreIds
-    const resp2 = await Promise.all([fetch(authorsUri), fetch(genresUri)])
-    const data = await Promise.all(resp2.map(e => e.json()))
-    authors.value = data[0]
-    genres.value = data[1]
+    genreId.value = book.genreId
+    resp = await db.collection('authors').get()
+    authors.value = resp.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
+    resp = await db.collection('genres').get()
+    genres.value = resp.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
     loaded.value = true
   } catch (err) {
     error.value = err.message
@@ -87,14 +87,10 @@ const handleSubmit = async () => {
     authorId: authorId.value,
     summary: summary.value,
     isbn: isbn.value,
-    genreIds: genreIds.value
+    genreId: genreId.value
   }
   try {
-    await fetch(bookUri, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(book)
-    })
+    db.collection('books').doc(props.id).update(book)
     router.push('/books') // redirect to book list
   } catch (err) {
     error.value = err.message
