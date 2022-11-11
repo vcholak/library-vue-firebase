@@ -14,7 +14,7 @@
     </p>
     <p>
       <strong>Genre:</strong>
-      <span v-for="genre in genres" :key="genre.id">
+      <span>
         <router-link :to="{name: 'GenreDetails', params: {id: genre.id}}">{{ genre.name}}</router-link>
       </span>
     </p>
@@ -57,24 +57,29 @@ const router = useRouter()
 const loaded = ref(false)
 const book = ref(null)
 const author = ref(null)
-const genres = ref([])
+const genre = ref(null)
 const copies = ref([])
 const error = ref(null)
 
-const genresUri = 'http://localhost:3000/genres/'
-const copiesUri = 'http://localhost:3000/copies'
-
 onMounted(async () => {
   try {
-    const bookData = await db.collection('books').doc(props.id).get()
-    book.value = bookData
-    const authorUri = 'http://localhost:3000/authors/' + bookData.authorId
-    const genreIds = bookData.genreIds
-    const resp2 = await Promise.all([fetch(authorUri), fetch(genresUri), fetch(copiesUri)])
-    const data = await Promise.all(resp2.map(e => e.json()))
-    author.value = data[0]
-    genres.value = data[1].filter(e => genreIds.includes(e.id))
-    copies.value = data[2].filter(c => c.bookId === bookData.id)
+    const bookResp = await db.collection('books').doc(props.id).get()
+    if (!bookResp.exists) {
+      throw new Error('No Book found with ID=' + props.id)
+    }
+    book.value = { ...bookResp.data(), id: bookResp.id }
+    const authorResp = await db.collection('authors').doc(book.value.authorId).get()
+    if (!authorResp.exists) {
+      throw new Error('No Author found with ID=' + book.value.authorId)
+    }
+    author.value = { ...authorResp.data(), id: authorResp.id }
+    const genreResp = await db.collection('genres').doc(book.value.genreId).get()
+    if (!genreResp.exists) {
+      throw new Error('No Genre found with ID=' + book.value.genreId)
+    }
+    genre.value = { ...genreResp.data(), id: genreResp.id }
+    const copiesResp = await db.collection('copies').get()
+    copies.value = copiesResp.docs.filter(c => c.bookId === book.value.id)
     loaded.value = true
   } catch (err) {
     error.value = err.message
@@ -87,7 +92,7 @@ const deleteBook = async () => {
       await db.collection('books').doc(props.id).delete()
       router.push('/books') // redirect to book list
     } catch (err) {
-      console.log(err)
+      error.value = err.message
     }
   }
 }

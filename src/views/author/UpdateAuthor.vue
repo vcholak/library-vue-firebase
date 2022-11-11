@@ -1,7 +1,7 @@
 <template>
   <h1>Update Author</h1>
   <div v-if="error">{{ error }}</div>
-  <div v-if="firstName">
+  <div v-if="loaded">
     <form @submit.prevent="handleSubmit">
       <div>
         <label>First Name:</label>
@@ -33,6 +33,7 @@
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from '../../firebase/config'
+import firebase from 'firebase/app'
 
 const props = defineProps(['id'])
 const router = useRouter()
@@ -42,14 +43,22 @@ const familyName = ref('')
 const birthDate = ref(null)
 const deathDate = ref(null)
 const error = ref(null)
+const loaded = ref(false)
 
 onMounted(async () => {
   try {
-    const data = await db.collection('authors').doc(props.id).get()
-    firstName.value = data.firstName
-    familyName.value = data.familyName
-    birthDate.value = data.birthDate
-    deathDate.value = data.deathDate
+    const resp = await db.collection('authors').doc(props.id).get()
+    if (!resp.exists) {
+      throw new Error('No Author found with ID=' + props.id)
+    }
+    const author = resp.data()
+    firstName.value = author.firstName
+    familyName.value = author.familyName
+    birthDate.value = author.birthDate.toDate().toISOString().substring(0, 10)
+    if (author.deathDate) {
+      deathDate.value = author.deathDate.toDate().toISOString().substring(0, 10)
+    }
+    loaded.value = true
   } catch (err) {
     error.value = err.message
   }
@@ -59,8 +68,8 @@ const handleSubmit = async () => {
   const author = {
     firstName: firstName.value,
     familyName: familyName.value,
-    birthDate: birthDate.value,
-    deathDate: deathDate.value
+    birthDate: firebase.firestore.Timestamp.fromDate(new Date(birthDate.value)),
+    deathDate: deathDate.value ? firebase.firestore.Timestamp.fromDate(new Date(deathDate.value)) : null
   }
   try {
     await db.collection('authors').doc(props.id).update(author)
