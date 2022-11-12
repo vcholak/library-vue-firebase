@@ -18,23 +18,27 @@
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
+// eslint-disable-next-line no-undef
 const props = defineProps(['id'])
+
 const router = useRouter()
 
 const loaded = ref(false)
 const name = ref('')
 const error = ref(null)
 
-const uri = 'http://localhost:3000/genres/' + props.id
-
 onMounted(async () => {
   try {
-    const resp = await fetch(uri)
-    const data = await resp.json()
-    name.value = data.name
+    const resp = await db.collection('genres').doc(props.id).get()
+    if (!resp.exists) {
+      throw new Error('No Genre found with ID=' + props.id)
+    }
+    const genre = resp.data()
+    name.value = genre.name
     loaded.value = true
   } catch (err) {
     error.value = err.message
@@ -46,11 +50,7 @@ const handleSubmit = async () => {
     name: name.value
   }
   try {
-    await fetch(uri, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(genre)
-    })
+    db.collection('genres').doc(props.id).update(genre)
     router.push('/genres') // redirect to book list
   } catch (err) {
     error.value = err.message
