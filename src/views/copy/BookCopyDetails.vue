@@ -26,6 +26,7 @@
 <script setup>
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
 const props = defineProps(['id'])
 const router = useRouter()
@@ -37,9 +38,11 @@ const uri = 'http://localhost:3000/copies/' + props.id
 
 onMounted(async () => {
   try {
-    const resp = await fetch(uri)
-    const data = await resp.json()
-    copy.value = data
+    const resp = await db.collection('copies').doc(props.id).get()
+    if (!resp.exists) {
+      throw new Error('No Book Copy found with ID=' + props.id)
+    }
+    copy.value = { ...resp.data(), id: resp.id }
   } catch (err) {
     error.value = err.message
   }
@@ -48,7 +51,7 @@ onMounted(async () => {
 const deleteBookCopy = async () => {
   if (confirm('Do you really want to delete this book copy?')) {
     try {
-      await fetch(uri, { method: 'DELETE' })
+      await db.collection('copies').doc(props.id).delete()
       router.push('/copies') // redirect to book copy list
     } catch (err) {
       error.value = err.message
