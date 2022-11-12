@@ -27,7 +27,7 @@ const handleSubmit = async () => {
     await db.collection('genres').add({ name: name.value })
     router.push('/genres') // redirect to genre list
   } catch (err) {
-    console.log(err)
+    error.value = err.message
   }
 }
 </script>

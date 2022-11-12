@@ -29,11 +29,13 @@
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from '../../firebase/config'
 
+// eslint-disable-next-line no-undef
 const props = defineProps(['id'])
+
 const router = useRouter()
 
 const genre = ref(null)
@@ -41,20 +43,19 @@ const books = ref([])
 const loaded = ref(false)
 const error = ref(null)
 
-const uri = 'http://localhost:3000/genres/' + props.id
-const booksUri = 'http://localhost:3000/books'
-
 onMounted(async () => {
   try {
-    const resp = await db.collection('genres').doc(props.id).get()
+    let resp = await db.collection('genres').doc(props.id).get()
     if (!resp.exists) {
       throw new Error('No Genre found with ID=' + props.id)
     }
-    genre.value = { ...resp.data(), id: resp.id }
-    const resp2 = await fetch(booksUri)
-    const allBooks = await resp2.json()
-    console.log(allBooks)
-    books.value = allBooks.filter(b => b.genreId === resp.id)
+    const genreId = resp.id
+    genre.value = { ...resp.data(), id: genreId }
+    resp = await db.collection('books').get()
+    const allBooks = resp.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
+    books.value = allBooks.filter(b => b.genreId === genreId)
     loaded.value = true
   } catch (err) {
     error.value = err.message
@@ -64,7 +65,7 @@ onMounted(async () => {
 const deleteGenre = async () => {
   if (confirm('Do you really want to delete this genre?')) {
     try {
-      await fetch(uri, { method: 'DELETE' })
+      await db.collection('genres').doc(props.id).delete()
       router.push('/genres') // redirect to genre list
     } catch (err) {
       error.value = err.message
