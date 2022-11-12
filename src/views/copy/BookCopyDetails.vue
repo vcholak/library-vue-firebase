@@ -24,17 +24,17 @@
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from '../../firebase/config'
 
+// eslint-disable-next-line no-undef
 const props = defineProps(['id'])
+
 const router = useRouter()
 
 const copy = ref(null)
 const error = ref(null)
-
-const uri = 'http://localhost:3000/copies/' + props.id
 
 onMounted(async () => {
   try {

@@ -21,12 +21,12 @@ const error = ref(null)
 
 onMounted(async () => {
   try {
-    const data = await db.collection('copies').get()
-    const resp = await db.collection('books').get()
+    let resp = await db.collection('books').get()
     const books = resp.docs.map(doc => {
       return { ...doc.data(), id: doc.id }
     })
-    copies.value = data.docs.map(doc => {
+    resp = await db.collection('copies').get()
+    copies.value = resp.docs.map(doc => {
       const data = doc.data()
       const book = books.find(b => b.id === data.bookId)
       return { ...data, id: doc.id, title: book.title }
