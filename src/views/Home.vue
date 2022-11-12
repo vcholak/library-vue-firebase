@@ -1,6 +1,7 @@
 <template>
   <div class="home">
     <h1>Welcome to Local Library</h1>
+    <div v-if="error">{{ error }}</div>
     <h2>Dynamic content</h2>
     <p>The library has the following record counts:</p>
     <ul>
@@ -23,38 +24,37 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Home',
-  data () {
-    return {
-      booksCnt: null,
-      copiesCnt: null,
-      availableCopiesCnt: null,
-      authorsCnt: null,
-      genresCnt: null,
-      loaded: false,
-      booksUri: 'http://localhost:3000/books/',
-      copiesUri: 'http://localhost:3000/copies/',
-      authorsUri: 'http://localhost:3000/authors',
-      genresUri: 'http://localhost:3000/genres'
-    }
-  },
-  async mounted () {
-    try {
-      const resp = await Promise.all([fetch(this.booksUri), fetch(this.copiesUri), fetch(this.authorsUri), fetch(this.genresUri)])
-      const data = await Promise.all(resp.map(e => e.json()))
-      console.log(data)
-      this.booksCnt = data[0].length
-      this.copiesCnt = data[1].length
-      this.availableCopiesCnt = data[1].filter(e => e.status === 'Available').length
-      this.authorsCnt = data[2].length
-      this.genresCnt = data[3].length
-    } catch (err) {
-      console.log(err)
-    }
+<script setup>
+import { ref, onMounted } from 'vue'
+import { db } from '../firebase/config'
+
+const booksCnt = ref(null)
+const copiesCnt = ref(null)
+const availableCopiesCnt = ref(null)
+const authorsCnt = ref(null)
+const genresCnt = ref(null)
+const loaded = ref(false)
+const error = ref(null)
+
+onMounted(async () => {
+  try {
+    let resp = await db.collection('books').get()
+    booksCnt.value = resp.docs.length
+    resp = await db.collection('copies').get()
+    const allCopies = resp.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
+    copiesCnt.value = allCopies.length
+    availableCopiesCnt.value = allCopies.filter(e => e.status === 'Available').length
+    resp = await db.collection('authors').get()
+    authorsCnt.value = resp.docs.length
+    resp = await db.collection('genres').get()
+    genresCnt.value = resp.docs.length
+    loaded.value = true
+  } catch (err) {
+    error.value = err.message
   }
-}
+})
 </script>
 
 <style scoped>
