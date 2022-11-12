@@ -34,10 +34,13 @@
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { db } from '../../firebase/config'
 
+// eslint-disable-next-line no-undef
 const props = defineProps(['id'])
+
 const router = useRouter()
 
 const loaded = ref(false)
@@ -50,20 +53,23 @@ const status = ref('')
 const statuses = ref(['Maintenance', 'Available', 'Loaned', 'Reserved'])
 const error = ref(null)
 
-const uri = 'http://localhost:3000/copies/' + props.id
-const booksUri = 'http://localhost:3000/books'
-
 onMounted(async () => {
   try {
-    const resp = await Promise.all([fetch(uri), fetch(booksUri)])
-    const data = await Promise.all(resp.map(e => e.json()))
-    const copy = data[0]
+    let resp = await db.collection('copies').doc(props.id).get()
+    if (!resp.exists) {
+      throw new Error('No Book Copy found with ID=' + props.id)
+    }
+    const copy = resp.data()
     bookId.value = copy.bookId
     bookTitle.value = copy.bookTitle
     imprint.value = copy.imprint
     availableDate.value = copy.availableDate
     status.value = copy.status
-    books.value = data[1]
+
+    resp = await db.collection('books').get()
+    books.value = resp.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
     loaded.value = true
   } catch (err) {
     error.value = err.message
@@ -79,11 +85,7 @@ const handleSubmit = async () => {
     status: status.value
   }
   try {
-    await fetch(uri, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(bookCopy)
-    })
+    db.collection('copies').doc(props.id).update(bookCopy)
     router.push('/copies') // redirect to book copy list
   } catch (err) {
     error.value = err.message

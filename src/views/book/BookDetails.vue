@@ -47,11 +47,13 @@
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from '../../firebase/config'
 
+// eslint-disable-next-line no-undef
 const props = defineProps(['id'])
+
 const router = useRouter()
 
 const loaded = ref(false)
@@ -67,19 +69,23 @@ onMounted(async () => {
     if (!bookResp.exists) {
       throw new Error('No Book found with ID=' + props.id)
     }
-    book.value = { ...bookResp.data(), id: bookResp.id }
-    const authorResp = await db.collection('authors').doc(book.value.authorId).get()
+    const bookData = { ...bookResp.data(), id: bookResp.id }
+    book.value = bookData
+    const authorResp = await db.collection('authors').doc(bookData.authorId).get()
     if (!authorResp.exists) {
-      throw new Error('No Author found with ID=' + book.value.authorId)
+      throw new Error('No Author found with ID=' + bookData.authorId)
     }
     author.value = { ...authorResp.data(), id: authorResp.id }
-    const genreResp = await db.collection('genres').doc(book.value.genreId).get()
+    const genreResp = await db.collection('genres').doc(bookData.genreId).get()
     if (!genreResp.exists) {
-      throw new Error('No Genre found with ID=' + book.value.genreId)
+      throw new Error('No Genre found with ID=' + bookData.genreId)
     }
     genre.value = { ...genreResp.data(), id: genreResp.id }
     const copiesResp = await db.collection('copies').get()
-    copies.value = copiesResp.docs.filter(c => c.bookId === book.value.id)
+    const copiesData = copiesResp.docs.map(doc => {
+      return { ...doc.data(), id: doc.id }
+    })
+    copies.value = copiesData.filter(c => c.bookId === bookData.id)
     loaded.value = true
   } catch (err) {
     error.value = err.message
