@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { defineProps, computed } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import getAuthor from '../../composables/getAuthor'
 import { db } from '../../firebase/config'
