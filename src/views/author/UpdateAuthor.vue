@@ -33,7 +33,7 @@
 import { ref, defineProps, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from '../../firebase/config'
-import firebase from 'firebase/app'
+import firebase from 'firebase/compat/app'
 
 const props = defineProps(['id'])
 const router = useRouter()

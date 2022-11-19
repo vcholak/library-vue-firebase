@@ -2,33 +2,38 @@
 
 ## Project setup
 ```
-yarn install
+pnpm install
 ```
 
-### Compiles and hot-reloads for development
+### Start the development server
 ```
-yarn serve
+pnpm dev
 ```
 
 ### Compiles and minifies for production
 ```
-yarn build
+pnpm build
+```
+
+### Preview the production build locally
+```
+pnpm serve
 ```
 
 ### Run your unit tests
 ```
-yarn test:unit
+pnpm test:unit
 ```
 
 ### Run your end-to-end tests
 ```
-yarn test:e2e
+pnpm test:e2e
 ```
 
 ### Lints and fixes files
 ```
-yarn lint
+pnpm lint
 ```
 
 ### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+See [Configuration Reference](https://vitejs.dev/config/).

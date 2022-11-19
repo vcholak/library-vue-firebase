@@ -1,6 +1,7 @@
-import firebase from 'firebase/app'
-import 'firebase/firestore'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/firestore'
 
+// TODO use .env file
 const firebaseConfig = {
   apiKey: 'AIzaSyACWI4T2l-7jZkc9A7xkVDHBljZVNMwM-Y',
   authDomain: 'library-e4a0a.firebaseapp.com',

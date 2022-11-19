@@ -1,21 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home'
-import AuthorList from '../views/author/AuthorList'
-import AuthorDetails from '../views/author/AuthorDetails'
-import CreateAuthor from '../views/author/CreateAuthor'
-import UpdateAuthor from '../views/author/UpdateAuthor'
-import GenreList from '../views/genre/GenreList'
-import CreateGenre from '../views/genre/CreateGenre'
-import GenreDetails from '../views/genre/GenreDetails'
-import UpdateGenre from '../views/genre/UpdateGenre'
-import BookList from '../views/book/BookList'
-import CreateBook from '../views/book/CreateBook'
-import BookDetails from '../views/book/BookDetails'
-import UpdateBook from '../views/book/UpdateBook'
-import BookCopyList from '../views/copy/BookCopyList'
-import CreateBookCopy from '../views/copy/CreateBookCopy'
-import BookCopyDetails from '../views/copy/BookCopyDetails'
-import UpdateBookCopy from '../views/copy/UpdateBookCopy'
+import Home from '../views/Home.vue'
+import AuthorList from '../views/author/AuthorList.vue'
+import AuthorDetails from '../views/author/AuthorDetails.vue'
+import CreateAuthor from '../views/author/CreateAuthor.vue'
+import UpdateAuthor from '../views/author/UpdateAuthor.vue'
+import GenreList from '../views/genre/GenreList.vue'
+import CreateGenre from '../views/genre/CreateGenre.vue'
+import GenreDetails from '../views/genre/GenreDetails.vue'
+import UpdateGenre from '../views/genre/UpdateGenre.vue'
+import BookList from '../views/book/BookList.vue'
+import CreateBook from '../views/book/CreateBook.vue'
+import BookDetails from '../views/book/BookDetails.vue'
+import UpdateBook from '../views/book/UpdateBook.vue'
+import BookCopyList from '../views/copy/BookCopyList.vue'
+import CreateBookCopy from '../views/copy/CreateBookCopy.vue'
+import BookCopyDetails from '../views/copy/BookCopyDetails.vue'
+import UpdateBookCopy from '../views/copy/UpdateBookCopy.vue'
 
 const routes = [
   {
@@ -117,12 +117,12 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: () => import('../views/About.vue')
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
 
