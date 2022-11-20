@@ -7,7 +7,7 @@
     <router-link to="/copies">Book Copies</router-link> |
     <router-link to="/about">About</router-link>
   </div>
-  <router-view/>
+  <router-view />
 </template>
 
 <style>

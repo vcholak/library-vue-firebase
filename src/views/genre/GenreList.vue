@@ -7,33 +7,35 @@
   <div>
     <ul>
       <li v-for="genre in genres" :key="genre.id">
-        <router-link :to="{name: 'GenreDetails', params: {id: genre.id}}">{{genre.name}}</router-link>
+        <router-link :to="{ name: 'GenreDetails', params: { id: genre.id } }">{{
+          genre.name
+        }}</router-link>
       </li>
     </ul>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { db } from '../../firebase/config'
+import { ref, onMounted } from "vue";
+import { db } from "../../firebase/config";
 
-const genres = ref([])
-const error = ref(null)
+const genres = ref([]);
+const error = ref(null);
 
 onMounted(async () => {
   try {
-    const data = await db.collection('genres').get()
-    genres.value = data.docs.map(doc => {
-      return { ...doc.data(), id: doc.id }
-    })
+    const data = await db.collection("genres").get();
+    genres.value = data.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id };
+    });
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   }
-})
+});
 </script>
 
 <style scoped>
-  li {
-    text-align: left;
-  }
+li {
+  text-align: left;
+}
 </style>

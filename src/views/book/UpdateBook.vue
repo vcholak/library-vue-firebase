@@ -5,26 +5,45 @@
     <form @submit.prevent="handleSubmit">
       <div>
         <label>Title:</label>
-        <input v-model="title" type="text" placeholder="Name of book" required/>
+        <input
+          v-model="title"
+          type="text"
+          placeholder="Name of book"
+          required
+        />
       </div>
       <div>
         <label>Author:</label>
         <select v-model="authorId" required>
-          <option v-for="author in authors" :key="author.id" :value="author.id">{{ author.familyName}}, {{ author.firstName }}</option>
+          <option v-for="author in authors" :key="author.id" :value="author.id">
+            {{ author.familyName }}, {{ author.firstName }}
+          </option>
         </select>
       </div>
       <div>
         <label>Summary:</label>
-        <input v-model="summary" type="text" placeholder="Summary of book" required/>
+        <input
+          v-model="summary"
+          type="text"
+          placeholder="Summary of book"
+          required
+        />
       </div>
       <div>
         <label>ISBN:</label>
-        <input v-model="isbn" type="text" placeholder="A 13-digit ISBN" required/>
+        <input
+          v-model="isbn"
+          type="text"
+          placeholder="A 13-digit ISBN"
+          required
+        />
       </div>
       <div>
         <label>Genre:</label>
         <select v-model="genreId" required>
-          <option v-for="genre in genres" :key="genre.id" :value="genre.id">{{ genre.name}}</option>
+          <option v-for="genre in genres" :key="genre.id" :value="genre.id">
+            {{ genre.name }}
+          </option>
         </select>
       </div>
       <div class="submit">
@@ -38,48 +57,48 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { db } from '../../firebase/config'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { db } from "../../firebase/config";
 
-const props = defineProps(['id'])
-const router = useRouter()
+const props = defineProps(["id"]);
+const router = useRouter();
 
-const loaded = ref(false)
-const authors = ref([])
-const genres = ref([])
-const title = ref('')
-const authorId = ref(null)
-const summary = ref('')
-const isbn = ref('')
-const genreId = ref(null)
-const error = ref(null)
+const loaded = ref(false);
+const authors = ref([]);
+const genres = ref([]);
+const title = ref("");
+const authorId = ref(null);
+const summary = ref("");
+const isbn = ref("");
+const genreId = ref(null);
+const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await db.collection('books').doc(props.id).get()
+    let resp = await db.collection("books").doc(props.id).get();
     if (!resp.exists) {
-      throw new Error('No Book found with ID=' + props.id)
+      throw new Error("No Book found with ID=" + props.id);
     }
-    const book = { ...resp.data(), id: resp.id }
-    title.value = book.title
-    authorId.value = book.authorId
-    summary.value = book.summary
-    isbn.value = book.isbn
-    genreId.value = book.genreId
-    resp = await db.collection('authors').get()
-    authors.value = resp.docs.map(doc => {
-      return { ...doc.data(), id: doc.id }
-    })
-    resp = await db.collection('genres').get()
-    genres.value = resp.docs.map(doc => {
-      return { ...doc.data(), id: doc.id }
-    })
-    loaded.value = true
+    const book = { ...resp.data(), id: resp.id };
+    title.value = book.title;
+    authorId.value = book.authorId;
+    summary.value = book.summary;
+    isbn.value = book.isbn;
+    genreId.value = book.genreId;
+    resp = await db.collection("authors").get();
+    authors.value = resp.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id };
+    });
+    resp = await db.collection("genres").get();
+    genres.value = resp.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id };
+    });
+    loaded.value = true;
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   }
-})
+});
 
 const handleSubmit = async () => {
   const book = {
@@ -87,25 +106,25 @@ const handleSubmit = async () => {
     authorId: authorId.value,
     summary: summary.value,
     isbn: isbn.value,
-    genreId: genreId.value
-  }
+    genreId: genreId.value,
+  };
   try {
-    db.collection('books').doc(props.id).update(book)
-    router.push('/books') // redirect to book list
+    db.collection("books").doc(props.id).update(book);
+    router.push("/books"); // redirect to book list
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   }
-}
+};
 </script>
 
 <style scoped>
 form {
-    max-width: 420px;
-    margin: 30px auto;
-    background: white;
-    text-align: left;
-    padding: 40px;
-    border-radius: 10px;
+  max-width: 420px;
+  margin: 30px auto;
+  background: white;
+  text-align: left;
+  padding: 40px;
+  border-radius: 10px;
 }
 label {
   color: #aaa;
@@ -139,5 +158,4 @@ button {
 .submit {
   text-align: center;
 }
-
 </style>

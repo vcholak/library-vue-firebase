@@ -4,17 +4,17 @@
     <h1>Book Copy Details</h1>
     <p>
       <strong>Title: </strong>
-      <router-link :to="{name: 'BookDetails', params: {id: copy.bookId}}">{{ copy.bookTitle}}</router-link>
+      <router-link :to="{ name: 'BookDetails', params: { id: copy.bookId } }">{{
+        copy.bookTitle
+      }}</router-link>
     </p>
-    <p>
-      <strong>Imprint: </strong>{{copy.imprint}}
-    </p>
-    <p>
-      <strong>Status: </strong>{{copy.status}}
-    </p>
-    <hr>
+    <p><strong>Imprint: </strong>{{ copy.imprint }}</p>
+    <p><strong>Status: </strong>{{ copy.status }}</p>
+    <hr />
     <button>
-      <router-link :to="{name: 'UpdateBookCopy', params: {id: copy.id}}">Update</router-link>
+      <router-link :to="{ name: 'UpdateBookCopy', params: { id: copy.id } }"
+        >Update</router-link
+      >
     </button>
     <button @click="deleteBookCopy">Delete</button>
   </div>
@@ -24,49 +24,49 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { db } from '../../firebase/config'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { db } from "../../firebase/config";
 
-const props = defineProps(['id'])
+const props = defineProps(["id"]);
 
-const router = useRouter()
+const router = useRouter();
 
-const copy = ref(null)
-const error = ref(null)
+const copy = ref(null);
+const error = ref(null);
 
 onMounted(async () => {
   try {
-    const resp = await db.collection('copies').doc(props.id).get()
+    const resp = await db.collection("copies").doc(props.id).get();
     if (!resp.exists) {
-      throw new Error('No Book Copy found with ID=' + props.id)
+      throw new Error("No Book Copy found with ID=" + props.id);
     }
-    copy.value = { ...resp.data(), id: resp.id }
+    copy.value = { ...resp.data(), id: resp.id };
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   }
-})
+});
 
 const deleteBookCopy = async () => {
-  if (confirm('Do you really want to delete this book copy?')) {
+  if (confirm("Do you really want to delete this book copy?")) {
     try {
-      await db.collection('copies').doc(props.id).delete()
-      router.push('/copies') // redirect to book copy list
+      await db.collection("copies").doc(props.id).delete();
+      router.push("/copies"); // redirect to book copy list
     } catch (err) {
-      error.value = err.message
+      error.value = err.message;
     }
   }
-}
+};
 </script>
 
 <style>
 form {
-    max-width: 420px;
-    margin: 30px auto;
-    background: white;
-    text-align: left;
-    padding: 40px;
-    border-radius: 10px;
+  max-width: 420px;
+  margin: 30px auto;
+  background: white;
+  text-align: left;
+  padding: 40px;
+  border-radius: 10px;
 }
 label {
   color: #aaa;

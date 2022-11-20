@@ -5,27 +5,46 @@
     <form @submit.prevent="handleSubmit">
       <div>
         <label>Title:</label>
-        <input v-model="title" type="text" placeholder="Name of book" required/>
+        <input
+          v-model="title"
+          type="text"
+          placeholder="Name of book"
+          required
+        />
       </div>
       <div>
         <label>Author:</label>
         <select v-model="authorId" required>
-          <option v-for="author in authors" :key="author.id" :value="author.id">{{ author.familyName}}, {{ author.firstName }}</option>
+          <option v-for="author in authors" :key="author.id" :value="author.id">
+            {{ author.familyName }}, {{ author.firstName }}
+          </option>
         </select>
       </div>
       <div>
         <label>Summary:</label>
-        <input v-model="summary" type="text" placeholder="Summary of book" required/>
+        <input
+          v-model="summary"
+          type="text"
+          placeholder="Summary of book"
+          required
+        />
       </div>
       <div>
         <label>ISBN:</label>
-        <input v-model="isbn" type="text" placeholder="A 13-digit ISBN" required/>
+        <input
+          v-model="isbn"
+          type="text"
+          placeholder="A 13-digit ISBN"
+          required
+        />
       </div>
       <div>
         <label>Genre:</label>
         <div>
           <select v-model="genreId" required>
-            <option v-for="genre in genres" :key="genre.id" :value="genre.id">{{ genre.name}}</option>
+            <option v-for="genre in genres" :key="genre.id" :value="genre.id">
+              {{ genre.name }}
+            </option>
           </select>
         </div>
       </div>
@@ -40,35 +59,35 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { db } from '../../firebase/config'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { db } from "../../firebase/config";
 
-const router = useRouter()
+const router = useRouter();
 
-const authors = ref([])
-const genres = ref([])
-const title = ref('')
-const authorId = ref(null)
-const summary = ref('')
-const isbn = ref('')
-const genreId = ref(null)
-const error = ref(null)
+const authors = ref([]);
+const genres = ref([]);
+const title = ref("");
+const authorId = ref(null);
+const summary = ref("");
+const isbn = ref("");
+const genreId = ref(null);
+const error = ref(null);
 
 onMounted(async () => {
   try {
-    let data = await db.collection('authors').get()
-    authors.value = data.docs.map(doc => {
-      return { ...doc.data(), id: doc.id }
-    })
-    data = await db.collection('genres').get()
-    genres.value = data.docs.map(doc => {
-      return { ...doc.data(), id: doc.id }
-    })
+    let data = await db.collection("authors").get();
+    authors.value = data.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id };
+    });
+    data = await db.collection("genres").get();
+    genres.value = data.docs.map((doc) => {
+      return { ...doc.data(), id: doc.id };
+    });
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   }
-})
+});
 
 const handleSubmit = async () => {
   const book = {
@@ -76,25 +95,25 @@ const handleSubmit = async () => {
     authorId: authorId.value,
     summary: summary.value,
     isbn: isbn.value,
-    genreId: genreId.value
-  }
+    genreId: genreId.value,
+  };
   try {
-    await db.collection('books').add(book)
-    router.push('/books') // redirect to book list
+    await db.collection("books").add(book);
+    router.push("/books"); // redirect to book list
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   }
-}
+};
 </script>
 
 <style scoped>
 form {
-    max-width: 420px;
-    margin: 30px auto;
-    background: white;
-    text-align: left;
-    padding: 40px;
-    border-radius: 10px;
+  max-width: 420px;
+  margin: 30px auto;
+  background: white;
+  text-align: left;
+  padding: 40px;
+  border-radius: 10px;
 }
 label {
   color: #aaa;
@@ -114,7 +133,7 @@ input {
   border-bottom: 1px solid #ddd;
   color: #555;
 }
-input[type=checkbox] {
+input[type="checkbox"] {
   display: inline;
   width: auto;
   margin: 3px;
