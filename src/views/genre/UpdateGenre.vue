@@ -5,7 +5,7 @@
     <form @submit.prevent="handleSubmit">
       <div>
         <label>Name:</label>
-        <input type="text" placeholder="Name of genre" required v-model="name"/>
+        <input v-model="name" type="text" placeholder="Name of genre" required/>
       </div>
       <div class="submit">
         <button>Update</button>

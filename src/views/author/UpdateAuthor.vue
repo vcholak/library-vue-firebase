@@ -5,19 +5,19 @@
     <form @submit.prevent="handleSubmit">
       <div>
         <label>First Name:</label>
-        <input type="text" required v-model="firstName"/>
+        <input v-model="firstName" type="text" required/>
       </div>
       <div>
         <label>Family Name:</label>
-        <input type="text" required v-model="familyName"/>
+        <input v-model="familyName" type="text" required/>
       </div>
       <div>
         <label>Date of birth:</label>
-        <input type="date" required v-model="birthDate"/>
+        <input v-model="birthDate" type="date" required/>
       </div>
       <div>
         <label>Date of death:</label>
-        <input type="date" v-model="deathDate"/>
+        <input v-model="deathDate" type="date"/>
       </div>
       <div class="submit">
         <button>Update</button>

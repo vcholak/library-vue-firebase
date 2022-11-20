@@ -4,7 +4,7 @@
   <form @submit.prevent="handleSubmit">
     <div>
       <label>Name:</label>
-      <input type="text" placeholder="Fantasy, Poetry etc." required v-model="name"/>
+      <input v-model="name" type="text" placeholder="Fantasy, Poetry etc." required/>
     </div>
     <div class="submit">
       <button>Create</button>

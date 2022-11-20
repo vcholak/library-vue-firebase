@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 module.exports = {
   root: true,
   env: {
@@ -9,8 +10,9 @@ module.exports = {
     'prettier'
   ],
   rules: {
-    'no-console': import.meta.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': import.meta.env.NODE_ENV === 'production' ? 'warn' : 'off'
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'vue/require-prop-types': 'off'
   },
   overrides: [
     {

@@ -5,26 +5,26 @@
     <form @submit.prevent="handleSubmit">
       <div>
         <label>Title:</label>
-        <input type="text" placeholder="Name of book" required v-model="title"/>
+        <input v-model="title" type="text" placeholder="Name of book" required/>
       </div>
       <div>
         <label>Author:</label>
         <select v-model="authorId" required>
-          <option :value="author.id" v-for="author in authors" :key="author.id">{{ author.familyName}}, {{ author.firstName }}</option>
+          <option v-for="author in authors" :key="author.id" :value="author.id">{{ author.familyName}}, {{ author.firstName }}</option>
         </select>
       </div>
       <div>
         <label>Summary:</label>
-        <input type="text" placeholder="Summary of book" required v-model="summary"/>
+        <input v-model="summary" type="text" placeholder="Summary of book" required/>
       </div>
       <div>
         <label>ISBN:</label>
-        <input type="text" placeholder="A 13-digit ISBN" required v-model="isbn"/>
+        <input v-model="isbn" type="text" placeholder="A 13-digit ISBN" required/>
       </div>
       <div>
         <label>Genre:</label>
         <select v-model="genreId" required>
-          <option :value="genre.id" v-for="genre in genres" :key="genre.id">{{ genre.name}}</option>
+          <option v-for="genre in genres" :key="genre.id" :value="genre.id">{{ genre.name}}</option>
         </select>
       </div>
       <div class="submit">

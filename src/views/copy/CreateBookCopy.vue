@@ -6,21 +6,21 @@
       <div>
         <label>Book:</label>
         <select v-model="bookId" required>
-          <option :value="book.id" v-for="book in books" :key="book.id">{{ book.title}}</option>
+          <option v-for="book in books" :key="book.id" :value="book.id">{{ book.title}}</option>
         </select>
       </div>
       <div>
         <label>Imprint:</label>
-        <input type="text" placeholder="Publisher and date information" required v-model="imprint"/>
+        <input v-model="imprint" type="text" placeholder="Publisher and date information" required/>
       </div>
       <div>
         <label>Date when book available:</label>
-        <input type="date" required v-model="availableDate"/>
+        <input v-model="availableDate" type="date" required/>
       </div>
       <div>
         <label>Status:</label>
         <select v-model="status" required>
-          <option :value="status" v-for="status in statuses" :key="status">{{status}}</option>
+          <option v-for="option in statuses" :key="option" :value="option">{{option}}</option>
         </select>
       </div>
       <div class="submit">
