@@ -16,12 +16,24 @@ import BookCopyList from "../views/copy/BookCopyList.vue";
 import CreateBookCopy from "../views/copy/CreateBookCopy.vue";
 import BookCopyDetails from "../views/copy/BookCopyDetails.vue";
 import UpdateBookCopy from "../views/copy/UpdateBookCopy.vue";
+import LoginForm from "../components/LoginForm.vue";
+import SignupForm from "../components/SignupForm.vue";
 
 const routes = [
   {
     path: "/",
     name: "HomeView",
     component: HomeView,
+  },
+  {
+    path: "/login",
+    name: "LoginForm",
+    component: LoginForm,
+  },
+  {
+    path: "/signup",
+    name: "SignupForm",
+    component: SignupForm,
   },
   {
     path: "/authors",

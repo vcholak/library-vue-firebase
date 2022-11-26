@@ -1,6 +1,10 @@
 <template>
   <div class="home">
-    <h1>Welcome to Local Library</h1>
+    <h1>Welcome to Your Local Library</h1>
+    <div>
+      <input v-model="search" type="text" placeholder="Search books" />
+      <button>Search</button>
+    </div>
     <div v-if="error">{{ error }}</div>
     <h2>Dynamic content</h2>
     <p>The library has the following record counts:</p>

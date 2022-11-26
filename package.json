@@ -2,6 +2,7 @@
   "name": "library-vue3",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -23,11 +24,15 @@
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-standard": "^8.0.0",
     "@vue/test-utils": "^2.0.0-0",
+    "autoprefixer": "^10.4.13",
     "chai": "^4.1.2",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-tailwindcss": "^3.7.0",
     "eslint-plugin-vue": "^9.0.0",
+    "postcss": "^8.4.19",
     "prettier": "2.7.1",
+    "tailwindcss": "^3.2.4",
     "vite": "^3.0.0"
   }
 }
