@@ -1,6 +1,8 @@
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
-import "firebase/compat/auth";
+//import firebase from "firebase/compat/app";
+//import "firebase/compat/firestore";
+//import "firebase/compat/auth";
+import { initializeApp, auth } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,11 +14,11 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
+const authService = auth();
 
 // Initialize Cloud Firestore and get a reference to the service
-const db = firebase.firestore();
+const db = getFirestore();
 
-export { auth, db };
+export { authService, db };

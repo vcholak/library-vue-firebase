@@ -11,7 +11,7 @@
         required
       />
     </div>
-    <div class="submit">
+    <div>
       <button>Create</button>
     </div>
   </form>
@@ -20,7 +20,8 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const router = useRouter();
 
@@ -29,7 +30,7 @@ const error = ref(null);
 
 const handleSubmit = async () => {
   try {
-    await db.collection("genres").add({ name: name.value });
+    await collection(db, "genres").add({ name: name.value });
     router.push("/genres"); // redirect to genre list
   } catch (err) {
     error.value = err.message;

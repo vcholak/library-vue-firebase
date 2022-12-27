@@ -46,7 +46,7 @@
           </option>
         </select>
       </div>
-      <div class="submit">
+      <div>
         <button>Update</button>
       </div>
     </form>
@@ -59,7 +59,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const props = defineProps(["id"]);
 const router = useRouter();
@@ -76,7 +77,7 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await db.collection("books").doc(props.id).get();
+    let resp = await collection(db, "books").doc(props.id).get();
     if (!resp.exists) {
       throw new Error("No Book found with ID=" + props.id);
     }
@@ -86,11 +87,11 @@ onMounted(async () => {
     summary.value = book.summary;
     isbn.value = book.isbn;
     genreId.value = book.genreId;
-    resp = await db.collection("authors").get();
+    resp = await collection(db, "authors").get();
     authors.value = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
-    resp = await db.collection("genres").get();
+    resp = await collection(db, "genres").get();
     genres.value = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -109,7 +110,7 @@ const handleSubmit = async () => {
     genreId: genreId.value,
   };
   try {
-    db.collection("books").doc(props.id).update(book);
+    await collection(db, "books").doc(props.id).update(book);
     router.push("/books"); // redirect to book list
   } catch (err) {
     error.value = err.message;
@@ -117,45 +118,4 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style scoped>
-form {
-  max-width: 420px;
-  margin: 30px auto;
-  background: white;
-  text-align: left;
-  padding: 40px;
-  border-radius: 10px;
-}
-label {
-  color: #aaa;
-  display: inline-block;
-  margin: 25px 0 15px;
-  font-size: 0.6em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: bold;
-}
-input {
-  display: block;
-  padding: 10px 6px;
-  width: 100%;
-  box-sizing: border-box;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  color: #555;
-}
-select {
-  display: block;
-}
-button {
-  background: #0b6dff;
-  border: 0;
-  padding: 10px 20px;
-  margin-top: 20px;
-  color: white;
-  border-radius: 20px;
-}
-.submit {
-  text-align: center;
-}
-</style>
+<style scoped></style>

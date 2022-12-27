@@ -26,7 +26,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const props = defineProps(["id"]);
 
@@ -37,7 +38,7 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    const resp = await db.collection("copies").doc(props.id).get();
+    const resp = await collection(db, "copies").doc(props.id).get();
     if (!resp.exists) {
       throw new Error("No Book Copy found with ID=" + props.id);
     }
@@ -50,7 +51,7 @@ onMounted(async () => {
 const deleteBookCopy = async () => {
   if (confirm("Do you really want to delete this book copy?")) {
     try {
-      await db.collection("copies").doc(props.id).delete();
+      await collection(db, "copies").doc(props.id).delete();
       router.push("/copies"); // redirect to book copy list
     } catch (err) {
       error.value = err.message;
@@ -59,45 +60,4 @@ const deleteBookCopy = async () => {
 };
 </script>
 
-<style>
-form {
-  max-width: 420px;
-  margin: 30px auto;
-  background: white;
-  text-align: left;
-  padding: 40px;
-  border-radius: 10px;
-}
-label {
-  color: #aaa;
-  display: inline-block;
-  margin: 25px 0 15px;
-  font-size: 0.6em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: bold;
-}
-input {
-  display: block;
-  padding: 10px 6px;
-  width: 100%;
-  box-sizing: border-box;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  color: #555;
-}
-select {
-  display: block;
-}
-button {
-  background: #0b6dff;
-  border: 0;
-  padding: 10px 20px;
-  margin-top: 20px;
-  color: white;
-  border-radius: 20px;
-}
-.submit {
-  text-align: center;
-}
-</style>
+<style></style>

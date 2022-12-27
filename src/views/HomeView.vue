@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div>
     <h1>Welcome to Your Local Library</h1>
     <div>
       <input v-model="search" type="text" placeholder="Search books" />
@@ -20,7 +20,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { db } from "../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const booksCnt = ref(null);
 const copiesCnt = ref(null);
@@ -32,9 +33,9 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await db.collection("books").get();
+    let resp = await collection(db, "books").get();
     booksCnt.value = resp.docs.length;
-    resp = await db.collection("copies").get();
+    resp = await collection(db, "copies").get();
     const allCopies = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -42,9 +43,9 @@ onMounted(async () => {
     availableCopiesCnt.value = allCopies.filter(
       (e) => e.status === "Available"
     ).length;
-    resp = await db.collection("authors").get();
+    resp = await collection(db, "authors").get();
     authorsCnt.value = resp.docs.length;
-    resp = await db.collection("genres").get();
+    resp = await collection(db, "genres").get();
     genresCnt.value = resp.docs.length;
     loaded.value = true;
   } catch (err) {
@@ -53,10 +54,4 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-ul {
-  position: relative;
-  left: 45%;
-  list-style-type: none;
-}
-</style>
+<style scoped></style>

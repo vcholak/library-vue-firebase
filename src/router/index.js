@@ -18,6 +18,19 @@ import BookCopyDetails from "../views/copy/BookCopyDetails.vue";
 import UpdateBookCopy from "../views/copy/UpdateBookCopy.vue";
 import LoginForm from "../components/LoginForm.vue";
 import SignupForm from "../components/SignupForm.vue";
+import DashboardView from "../views/DashboardView.vue";
+import { auth } from "../firebase/config";
+
+// auth guards
+const requireAuth = (to, from, next) => {
+  let user = auth.currentUser;
+  console.log("current user in auth guard: ", user);
+  if (!user) {
+    next({ name: "LoginForm" });
+  } else {
+    next();
+  }
+};
 
 const routes = [
   {
@@ -36,6 +49,12 @@ const routes = [
     component: SignupForm,
   },
   {
+    path: "/dashboard",
+    name: "DashboardView",
+    component: DashboardView,
+    beforeEnter: requireAuth,
+  },
+  {
     path: "/authors",
     name: "AuthorList",
     component: AuthorList,
@@ -44,6 +63,7 @@ const routes = [
     path: "/authors/create",
     name: "CreateAuthor",
     component: CreateAuthor,
+    beforeEnter: requireAuth,
   },
   {
     path: "/authors/:id",
@@ -56,6 +76,7 @@ const routes = [
     name: "UpdateAuthor",
     component: UpdateAuthor,
     props: true,
+    beforeEnter: requireAuth,
   },
   {
     path: "/genres",
@@ -66,6 +87,7 @@ const routes = [
     path: "/genres/create",
     name: "CreateGenre",
     component: CreateGenre,
+    beforeEnter: requireAuth,
   },
   {
     path: "/genres/:id",
@@ -78,6 +100,7 @@ const routes = [
     name: "UpdateGenre",
     component: UpdateGenre,
     props: true,
+    beforeEnter: requireAuth,
   },
   {
     path: "/books",
@@ -88,6 +111,7 @@ const routes = [
     path: "/books/create",
     name: "CreateBook",
     component: CreateBook,
+    beforeEnter: requireAuth,
   },
   {
     path: "/books/:id",
@@ -100,6 +124,7 @@ const routes = [
     name: "UpdateBook",
     component: UpdateBook,
     props: true,
+    beforeEnter: requireAuth,
   },
   {
     path: "/copies",
@@ -110,6 +135,7 @@ const routes = [
     path: "/copies/create",
     name: "CreateBookCopy",
     component: CreateBookCopy,
+    beforeEnter: requireAuth,
   },
   {
     path: "/copies/:id",
@@ -122,6 +148,7 @@ const routes = [
     name: "UpdateBookCopy",
     component: UpdateBookCopy,
     props: true,
+    beforeEnter: requireAuth,
   },
   {
     path: "/about",

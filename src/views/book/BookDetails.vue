@@ -18,12 +18,12 @@
         }}</router-link>
       </span>
     </p>
-    <div class="copies">
+    <div>
       <h4>Copies</h4>
       <div v-if="copies.length">
         <div v-for="copy in copies" :key="copy.id">
           <hr />
-          <p class="text-danger">{{ copy.status }}</p>
+          <p>{{ copy.status }}</p>
           <p><strong>Imprint: </strong>{{ copy.imprint }}</p>
           <p>
             <strong>Id: </strong>
@@ -52,7 +52,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const props = defineProps(["id"]);
 
@@ -67,26 +68,27 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    const bookResp = await db.collection("books").doc(props.id).get();
+    const bookResp = await collection(db, "books").doc(props.id).get();
     if (!bookResp.exists) {
       throw new Error("No Book found with ID=" + props.id);
     }
     const bookData = { ...bookResp.data(), id: bookResp.id };
     book.value = bookData;
-    const authorResp = await db
-      .collection("authors")
+    const authorResp = await collection(db, "authors")
       .doc(bookData.authorId)
       .get();
     if (!authorResp.exists) {
       throw new Error("No Author found with ID=" + bookData.authorId);
     }
     author.value = { ...authorResp.data(), id: authorResp.id };
-    const genreResp = await db.collection("genres").doc(bookData.genreId).get();
+    const genreResp = await collection(db, "genres")
+      .doc(bookData.genreId)
+      .get();
     if (!genreResp.exists) {
       throw new Error("No Genre found with ID=" + bookData.genreId);
     }
     genre.value = { ...genreResp.data(), id: genreResp.id };
-    const copiesResp = await db.collection("copies").get();
+    const copiesResp = await collection(db, "copies").get();
     const copiesData = copiesResp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -100,7 +102,7 @@ onMounted(async () => {
 const deleteBook = async () => {
   if (confirm("Do you really want to delete this Book?")) {
     try {
-      await db.collection("books").doc(props.id).delete();
+      await collection(db, "books").doc(props.id).delete();
       router.push("/books"); // redirect to book list
     } catch (err) {
       error.value = err.message;
@@ -109,32 +111,4 @@ const deleteBook = async () => {
 };
 </script>
 
-<style scoped>
-p {
-  text-align: left;
-}
-div.copies {
-  margin-left: 20px;
-  margin-top: 20px;
-  text-align: left;
-}
-h4 {
-  font-size: 1.5rem;
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  line-height: 1.2;
-}
-span {
-  margin-left: 10px;
-}
-.text-success {
-  color: #28a745 !important;
-}
-.text-warning {
-  color: #ffc107 !important;
-}
-.text-danger {
-  color: #dc3545 !important;
-}
-</style>
+<style scoped></style>

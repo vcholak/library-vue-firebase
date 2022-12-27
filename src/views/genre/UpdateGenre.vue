@@ -12,7 +12,7 @@
           required
         />
       </div>
-      <div class="submit">
+      <div>
         <button>Update</button>
       </div>
     </form>
@@ -25,7 +25,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const props = defineProps(["id"]);
 
@@ -37,7 +38,7 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    const resp = await db.collection("genres").doc(props.id).get();
+    const resp = await collection(db, "genres").doc(props.id).get();
     if (!resp.exists) {
       throw new Error("No Genre found with ID=" + props.id);
     }
@@ -54,7 +55,7 @@ const handleSubmit = async () => {
     name: name.value,
   };
   try {
-    db.collection("genres").doc(props.id).update(genre);
+    await collection(db, "genres").doc(props.id).update(genre);
     router.push("/genres"); // redirect to book list
   } catch (err) {
     error.value = err.message;

@@ -32,7 +32,7 @@
           </option>
         </select>
       </div>
-      <div class="submit">
+      <div>
         <button>Update</button>
       </div>
     </form>
@@ -45,7 +45,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const props = defineProps(["id"]);
 
@@ -63,7 +64,7 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await db.collection("copies").doc(props.id).get();
+    let resp = await collection(db, "copies").doc(props.id).get();
     if (!resp.exists) {
       throw new Error("No Book Copy found with ID=" + props.id);
     }
@@ -74,7 +75,7 @@ onMounted(async () => {
     availableDate.value = copy.availableDate;
     status.value = copy.status;
 
-    resp = await db.collection("books").get();
+    resp = await collection(db, "books").get();
     books.value = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -93,7 +94,7 @@ const handleSubmit = async () => {
     status: status.value,
   };
   try {
-    db.collection("copies").doc(props.id).update(bookCopy);
+    await collection(db, "copies").doc(props.id).update(bookCopy);
     router.push("/copies"); // redirect to book copy list
   } catch (err) {
     error.value = err.message;
@@ -101,45 +102,4 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style>
-form {
-  max-width: 420px;
-  margin: 30px auto;
-  background: white;
-  text-align: left;
-  padding: 40px;
-  border-radius: 10px;
-}
-label {
-  color: #aaa;
-  display: inline-block;
-  margin: 25px 0 15px;
-  font-size: 0.6em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: bold;
-}
-input {
-  display: block;
-  padding: 10px 6px;
-  width: 100%;
-  box-sizing: border-box;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  color: #555;
-}
-select {
-  display: block;
-}
-button {
-  background: #0b6dff;
-  border: 0;
-  padding: 10px 20px;
-  margin-top: 20px;
-  color: white;
-  border-radius: 20px;
-}
-.submit {
-  text-align: center;
-}
-</style>
+<style></style>

@@ -14,15 +14,11 @@
 </template>
 
 <script setup>
-import getAuthors from "../../composables/getAuthors";
+import getAuthors from "@/composables/getAuthors";
 
 const { authors, error, load } = getAuthors();
 
 load();
 </script>
 
-<style scoped>
-li {
-  text-align: left;
-}
-</style>
+<style scoped></style>

@@ -17,14 +17,15 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const genres = ref([]);
 const error = ref(null);
 
 onMounted(async () => {
   try {
-    const data = await db.collection("genres").get();
+    const data = await collection(db, "genres").get();
     genres.value = data.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -34,8 +35,4 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-li {
-  text-align: left;
-}
-</style>
+<style scoped></style>

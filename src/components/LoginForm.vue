@@ -12,7 +12,10 @@
 
 <script setup>
 import { ref } from "vue";
-import { auth } from "../firebase/config";
+import { useRouter } from "vue-router";
+import { authService } from "@/firebase/config";
+
+const router = useRouter();
 
 const email = ref("");
 const password = ref("");
@@ -21,7 +24,7 @@ const error = ref(null);
 const handleSubmit = async () => {
   error.value = null;
   try {
-    const resp = await auth.signInWithEmailAndPassword(
+    const resp = await authService.signInWithEmailAndPassword(
       email.value,
       password.value
     );
@@ -30,6 +33,7 @@ const handleSubmit = async () => {
     }
     error.value = null;
     console.log(resp.user);
+    router.push("/dashboard"); // redirect to Dashboard
   } catch (err) {
     console.log(err.message);
     error.value = "Incorrect login credentials";
@@ -37,4 +41,4 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

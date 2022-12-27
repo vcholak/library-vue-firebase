@@ -42,8 +42,9 @@
 <script setup>
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import getAuthor from "../../composables/getAuthor";
-import { db } from "../../firebase/config";
+import { collection } from "firebase/firestore";
+import getAuthor from "@/composables/getAuthor";
+import { db } from "@/firebase/config";
 
 const props = defineProps(["id"]);
 const router = useRouter();
@@ -56,7 +57,7 @@ const { error, loaded, author, books, load } = getAuthor(props.id);
 const deleteAuthor = async () => {
   if (confirm("Do you really want to delete this Author?")) {
     try {
-      await db.collection("authors").doc(props.id).delete();
+      await collection(db, "authors").doc(props.id).delete();
       router.push("/authors"); // redirect to author list
     } catch (err) {
       error.value = err.message;
@@ -75,12 +76,4 @@ const deathDate = computed(() => {
 load();
 </script>
 
-<style scoped>
-button {
-  margin: 20px;
-}
-dt,
-dd {
-  text-align: left;
-}
-</style>
+<style scoped></style>

@@ -36,7 +36,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const props = defineProps(["id"]);
 
@@ -49,13 +50,13 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await db.collection("genres").doc(props.id).get();
+    let resp = await collection(db, "genres").doc(props.id).get();
     if (!resp.exists) {
       throw new Error("No Genre found with ID=" + props.id);
     }
     const genreId = resp.id;
     genre.value = { ...resp.data(), id: genreId };
-    resp = await db.collection("books").get();
+    resp = await collection(db, "books").get();
     const allBooks = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -69,7 +70,7 @@ onMounted(async () => {
 const deleteGenre = async () => {
   if (confirm("Do you really want to delete this genre?")) {
     try {
-      await db.collection("genres").doc(props.id).delete();
+      await collection(db, "genres").doc(props.id).delete();
       router.push("/genres"); // redirect to genre list
     } catch (err) {
       error.value = err.message;

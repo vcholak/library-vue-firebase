@@ -1,5 +1,6 @@
 import { ref } from "vue";
-import { db } from "../firebase/config";
+import { collection } from "firebase/firestore";
+import { db } from "@/firebase/config";
 
 const getAuthor = (id) => {
   const error = ref(null);
@@ -9,12 +10,12 @@ const getAuthor = (id) => {
 
   const load = async () => {
     try {
-      const resp = await db.collection("authors").doc(id).get();
+      const resp = await collection(db, "authors").doc(id).get();
       if (!resp.exists) {
         throw new Error("No Author found with ID=" + id);
       }
       author.value = { ...resp.data(), id: resp.id };
-      const booksResp = await db.collection("books").get();
+      const booksResp = await collection(db, "books").get();
       const allBooks = booksResp.docs.map((doc) => {
         return { ...doc.data(), id: doc.id };
       });

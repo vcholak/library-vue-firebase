@@ -14,17 +14,20 @@
 
 <script setup>
 import { ref } from "vue";
-import { auth } from "../firebase/config";
+import { useRouter } from "vue-router";
+import { authService } from "@/firebase/config";
 
 const displayName = ref("");
 const email = ref("");
 const password = ref("");
 const error = ref(null);
 
+const router = useRouter();
+
 const handleSubmit = async () => {
   error.value = null;
   try {
-    const resp = await auth.createUserWithEmailAndPassword(
+    const resp = await authService.createUserWithEmailAndPassword(
       email.value,
       password.value
     );
@@ -34,6 +37,7 @@ const handleSubmit = async () => {
     await resp.user.updateProfile({ displayName: displayName.value });
     error.value = null;
     console.log(resp.user);
+    router.push("/dashboard"); // redirect to Dashboard
   } catch (err) {
     console.log(err.message);
     error.value = err.message;
@@ -41,4 +45,4 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>

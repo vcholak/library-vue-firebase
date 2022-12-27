@@ -19,7 +19,7 @@
         <label>Date of death:</label>
         <input v-model="deathDate" type="date" />
       </div>
-      <div class="submit">
+      <div>
         <button>Update</button>
       </div>
     </form>
@@ -32,7 +32,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 import firebase from "firebase/compat/app";
 
 const props = defineProps(["id"]);
@@ -47,7 +48,7 @@ const loaded = ref(false);
 
 onMounted(async () => {
   try {
-    const resp = await db.collection("authors").doc(props.id).get();
+    const resp = await collection(db, "authors").doc(props.id).get();
     if (!resp.exists) {
       throw new Error("No Author found with ID=" + props.id);
     }
@@ -77,7 +78,7 @@ const handleSubmit = async () => {
       : null,
   };
   try {
-    await db.collection("authors").doc(props.id).update(author);
+    await collection(db, "authors").doc(props.id).update(author);
     router.push("/authors"); // redirect to author list
   } catch (err) {
     error.value = err.message;
@@ -85,42 +86,4 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style scoped>
-form {
-  max-width: 420px;
-  margin: 30px auto;
-  background: white;
-  text-align: left;
-  padding: 40px;
-  border-radius: 10px;
-}
-label {
-  color: #aaa;
-  display: inline-block;
-  margin: 25px 0 15px;
-  font-size: 0.6em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: bold;
-}
-input {
-  display: block;
-  padding: 10px 6px;
-  width: 100%;
-  box-sizing: border-box;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  color: #555;
-}
-button {
-  background: #0b6dff;
-  border: 0;
-  padding: 10px 20px;
-  margin-top: 20px;
-  color: white;
-  border-radius: 20px;
-}
-.submit {
-  text-align: center;
-}
-</style>
+<style scoped></style>

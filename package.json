@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "css": "pnpm dlx tailwindcss -i ./src/input.css -o ./public/css/style.css --watch",
     "serve": "vite preview",
     "test:unit": "vite test:unit",
     "test:e2e": "vite test:e2e",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3",
-    "firebase": "^9.0.0",
+    "firebase": "^9.15.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"

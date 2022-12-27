@@ -16,18 +16,19 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const copies = ref([]);
 const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await db.collection("books").get();
+    let resp = await collection(db, "books").get();
     const books = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
-    resp = await db.collection("copies").get();
+    resp = await collection(db, "copies").get();
     copies.value = resp.docs.map((doc) => {
       const data = doc.data();
       const book = books.find((b) => b.id === data.bookId);
@@ -39,8 +40,4 @@ onMounted(async () => {
 });
 </script>
 
-<style>
-li {
-  text-align: left;
-}
-</style>
+<style></style>

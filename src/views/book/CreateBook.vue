@@ -48,7 +48,7 @@
           </select>
         </div>
       </div>
-      <div class="submit">
+      <div>
         <button>Create</button>
       </div>
     </form>
@@ -61,7 +61,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { db } from "../../firebase/config";
+import { db } from "@/firebase/config";
+import { collection } from "firebase/firestore";
 
 const router = useRouter();
 
@@ -76,11 +77,11 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    let data = await db.collection("authors").get();
+    let data = await collection(db, "authors").get();
     authors.value = data.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
-    data = await db.collection("genres").get();
+    data = await collection(db, "genres").get();
     genres.value = data.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -98,7 +99,7 @@ const handleSubmit = async () => {
     genreId: genreId.value,
   };
   try {
-    await db.collection("books").add(book);
+    await collection(db, "books").add(book);
     router.push("/books"); // redirect to book list
   } catch (err) {
     error.value = err.message;
@@ -106,54 +107,4 @@ const handleSubmit = async () => {
 };
 </script>
 
-<style scoped>
-form {
-  max-width: 420px;
-  margin: 30px auto;
-  background: white;
-  text-align: left;
-  padding: 40px;
-  border-radius: 10px;
-}
-label {
-  color: #aaa;
-  display: inline-block;
-  margin: 25px 0 15px;
-  font-size: 0.6em;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: bold;
-}
-input {
-  display: block;
-  padding: 10px 6px;
-  width: 100%;
-  box-sizing: border-box;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  color: #555;
-}
-input[type="checkbox"] {
-  display: inline;
-  width: auto;
-  margin: 3px;
-  padding: 0;
-  box-sizing: border-box;
-}
-select {
-  display: block;
-  width: 100%;
-  padding: 10px 6px;
-}
-button {
-  background: #0b6dff;
-  border: 0;
-  padding: 10px 20px;
-  margin-top: 20px;
-  color: white;
-  border-radius: 20px;
-}
-.submit {
-  text-align: center;
-}
-</style>
+<style scoped></style>
