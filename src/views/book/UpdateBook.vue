@@ -60,7 +60,13 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 
 const props = defineProps(["id"]);
 const router = useRouter();
@@ -77,7 +83,8 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await collection(db, "books").doc(props.id).get();
+    let colRef = doc(db, "books", props.id);
+    let resp = await getDoc(colRef);
     if (!resp.exists) {
       throw new Error("No Book found with ID=" + props.id);
     }
@@ -87,11 +94,15 @@ onMounted(async () => {
     summary.value = book.summary;
     isbn.value = book.isbn;
     genreId.value = book.genreId;
-    resp = await collection(db, "authors").get();
+
+    colRef = collection(db, "authors");
+    resp = await getDocs(colRef);
     authors.value = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
-    resp = await collection(db, "genres").get();
+
+    colRef = collection(db, "genres");
+    resp = await getDocs(colRef);
     genres.value = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -110,7 +121,8 @@ const handleSubmit = async () => {
     genreId: genreId.value,
   };
   try {
-    await collection(db, "books").doc(props.id).update(book);
+    const docRef = doc(db, "books", props.id);
+    await updateDoc(docRef, book);
     router.push("/books"); // redirect to book list
   } catch (err) {
     error.value = err.message;

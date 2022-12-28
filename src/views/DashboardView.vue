@@ -10,16 +10,16 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from "@/firebase/config";
+import { auth } from "@/firebase/config";
 
 // refs
 const error = ref(null);
-const user = ref(authService.currentUser);
+const user = ref(auth.currentUser);
 
 const router = useRouter();
 
 // listen for auth changes outside of function, so only 1 listener is ever attached
-authService.onAuthStateChanged((_user) => {
+auth.onAuthStateChanged((_user) => {
   console.log("User state change. Current user is:", _user);
   user.value = _user;
 });
@@ -28,7 +28,7 @@ const logout = async () => {
   error.value = null;
 
   try {
-    await authService.signOut();
+    await auth.signOut();
     router.push("/"); // redirect to Home page
   } catch (err) {
     console.log(err.message);

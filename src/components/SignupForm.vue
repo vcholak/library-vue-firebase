@@ -15,7 +15,8 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from "@/firebase/config";
+import { auth } from "@/firebase/config";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const displayName = ref("");
 const email = ref("");
@@ -27,7 +28,8 @@ const router = useRouter();
 const handleSubmit = async () => {
   error.value = null;
   try {
-    const resp = await authService.createUserWithEmailAndPassword(
+    const resp = await createUserWithEmailAndPassword(
+      auth,
       email.value,
       password.value
     );

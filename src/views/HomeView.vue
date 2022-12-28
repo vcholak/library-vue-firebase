@@ -21,7 +21,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 
 const booksCnt = ref(null);
 const copiesCnt = ref(null);
@@ -30,12 +30,16 @@ const authorsCnt = ref(null);
 const genresCnt = ref(null);
 const loaded = ref(false);
 const error = ref(null);
+const search = ref("");
 
 onMounted(async () => {
   try {
-    let resp = await collection(db, "books").get();
+    let colRef = collection(db, "books");
+    let resp = await getDocs(colRef);
     booksCnt.value = resp.docs.length;
-    resp = await collection(db, "copies").get();
+
+    colRef = collection(db, "copies");
+    resp = await getDocs(colRef);
     const allCopies = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -43,9 +47,13 @@ onMounted(async () => {
     availableCopiesCnt.value = allCopies.filter(
       (e) => e.status === "Available"
     ).length;
-    resp = await collection(db, "authors").get();
+
+    colRef = collection(db, "authors");
+    resp = await getDocs(colRef);
     authorsCnt.value = resp.docs.length;
-    resp = await collection(db, "genres").get();
+
+    colRef = collection(db, "genres");
+    resp = await getDocs(colRef);
     genresCnt.value = resp.docs.length;
     loaded.value = true;
   } catch (err) {

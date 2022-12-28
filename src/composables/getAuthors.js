@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { collection } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/config";
 
 const getAuthors = () => {
@@ -8,7 +8,8 @@ const getAuthors = () => {
 
   const load = async () => {
     try {
-      const data = await collection(db, "authors").get();
+      const colRef = collection(db, "authors");
+      const data = await getDocs(colRef);
       authors.value = data.docs.map((doc) => {
         return { ...doc.data(), id: doc.id };
       });

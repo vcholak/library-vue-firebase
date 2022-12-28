@@ -46,7 +46,13 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 
 const props = defineProps(["id"]);
 
@@ -64,7 +70,8 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await collection(db, "copies").doc(props.id).get();
+    const docRef = doc(db, "copies", props.id);
+    let resp = await getDoc(docRef);
     if (!resp.exists) {
       throw new Error("No Book Copy found with ID=" + props.id);
     }
@@ -75,7 +82,8 @@ onMounted(async () => {
     availableDate.value = copy.availableDate;
     status.value = copy.status;
 
-    resp = await collection(db, "books").get();
+    const colRef = collection(db, "books");
+    resp = await getDocs(colRef);
     books.value = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -94,7 +102,8 @@ const handleSubmit = async () => {
     status: status.value,
   };
   try {
-    await collection(db, "copies").doc(props.id).update(bookCopy);
+    const docRef = doc(db, "copies", props.id);
+    await updateDoc(docRef, bookCopy);
     router.push("/copies"); // redirect to book copy list
   } catch (err) {
     error.value = err.message;

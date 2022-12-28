@@ -13,7 +13,8 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from "@/firebase/config";
+import { auth } from "@/firebase/config";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const router = useRouter();
 
@@ -24,7 +25,8 @@ const error = ref(null);
 const handleSubmit = async () => {
   error.value = null;
   try {
-    const resp = await authService.signInWithEmailAndPassword(
+    const resp = await signInWithEmailAndPassword(
+      auth,
       email.value,
       password.value
     );

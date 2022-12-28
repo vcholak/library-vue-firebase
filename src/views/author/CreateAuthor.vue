@@ -27,7 +27,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { collection } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 
 const firstName = ref("");
@@ -46,7 +46,8 @@ const handleSubmit = async () => {
     deathDate: deathDate.value,
   };
   try {
-    await collection(db, "authors").add(author);
+    const colRef = collection(db, "authors");
+    await addDoc(colRef, author);
 
     router.push("/authors"); // redirect to author list
   } catch (err) {

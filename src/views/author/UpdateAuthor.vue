@@ -33,8 +33,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
-import firebase from "firebase/compat/app";
+import { doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 
 const props = defineProps(["id"]);
 const router = useRouter();
@@ -48,7 +47,8 @@ const loaded = ref(false);
 
 onMounted(async () => {
   try {
-    const resp = await collection(db, "authors").doc(props.id).get();
+    const docRef = doc(db, "authors", props.id);
+    const resp = await getDoc(docRef);
     if (!resp.exists) {
       throw new Error("No Author found with ID=" + props.id);
     }
@@ -72,13 +72,15 @@ const handleSubmit = async () => {
   const author = {
     firstName: firstName.value,
     familyName: familyName.value,
-    birthDate: firebase.firestore.Timestamp.fromDate(new Date(birthDate.value)),
+    birthDate: Timestamp.fromDate(new Date(birthDate.value)),
     deathDate: deathDate.value
-      ? firebase.firestore.Timestamp.fromDate(new Date(deathDate.value))
+      ? Timestamp.fromDate(new Date(deathDate.value))
       : null,
   };
+
   try {
-    await collection(db, "authors").doc(props.id).update(author);
+    const docRef = doc(db, "authors", props.id);
+    await updateDoc(docRef, author);
     router.push("/authors"); // redirect to author list
   } catch (err) {
     error.value = err.message;

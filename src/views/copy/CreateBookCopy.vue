@@ -46,7 +46,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 
 const router = useRouter();
 
@@ -60,7 +60,8 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    const data = await collection(db, "books").get();
+    const colRef = collection(db, "books");
+    const data = await getDocs(colRef);
     books.value = data.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -78,7 +79,8 @@ const handleSubmit = async () => {
     status: status.value,
   };
   try {
-    await collection(db, "copies").add(bookCopy);
+    const colRef = collection(db, "copies");
+    await addDoc(colRef, bookCopy);
     router.push("/copies"); // redirect to book copy list
   } catch (err) {
     error.value = err.message;

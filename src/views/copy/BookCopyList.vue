@@ -17,18 +17,21 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 
 const copies = ref([]);
 const error = ref(null);
 
 onMounted(async () => {
   try {
-    let resp = await collection(db, "books").get();
+    let colRef = collection(db, "books");
+    let resp = await getDocs(colRef);
     const books = resp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
-    resp = await collection(db, "copies").get();
+
+    colRef = collection(db, "copies");
+    resp = await getDocs(colRef);
     copies.value = resp.docs.map((doc) => {
       const data = doc.data();
       const book = books.find((b) => b.id === data.bookId);

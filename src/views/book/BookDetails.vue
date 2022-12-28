@@ -53,7 +53,13 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
 
 const props = defineProps(["id"]);
 
@@ -68,27 +74,30 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    const bookResp = await collection(db, "books").doc(props.id).get();
+    let docRef = doc(db, "books", props.id);
+    const bookResp = await getDoc(docRef);
     if (!bookResp.exists) {
       throw new Error("No Book found with ID=" + props.id);
     }
     const bookData = { ...bookResp.data(), id: bookResp.id };
     book.value = bookData;
-    const authorResp = await collection(db, "authors")
-      .doc(bookData.authorId)
-      .get();
+
+    docRef = doc(db, "authors", bookData.authorId);
+    const authorResp = await getDoc(docRef);
     if (!authorResp.exists) {
       throw new Error("No Author found with ID=" + bookData.authorId);
     }
     author.value = { ...authorResp.data(), id: authorResp.id };
-    const genreResp = await collection(db, "genres")
-      .doc(bookData.genreId)
-      .get();
+
+    docRef = doc(db, "genres", bookData.genreId);
+    const genreResp = await getDoc(docRef);
     if (!genreResp.exists) {
       throw new Error("No Genre found with ID=" + bookData.genreId);
     }
     genre.value = { ...genreResp.data(), id: genreResp.id };
-    const copiesResp = await collection(db, "copies").get();
+
+    const colRef = collection(db, "copies");
+    const copiesResp = await getDocs(colRef);
     const copiesData = copiesResp.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -102,7 +111,8 @@ onMounted(async () => {
 const deleteBook = async () => {
   if (confirm("Do you really want to delete this Book?")) {
     try {
-      await collection(db, "books").doc(props.id).delete();
+      const docRef = doc(db, "books", props.id);
+      await deleteDoc(docRef);
       router.push("/books"); // redirect to book list
     } catch (err) {
       error.value = err.message;

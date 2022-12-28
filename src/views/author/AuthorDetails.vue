@@ -42,7 +42,7 @@
 <script setup>
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { collection } from "firebase/firestore";
+import { doc, deleteDoc } from "firebase/firestore";
 import getAuthor from "@/composables/getAuthor";
 import { db } from "@/firebase/config";
 
@@ -57,7 +57,8 @@ const { error, loaded, author, books, load } = getAuthor(props.id);
 const deleteAuthor = async () => {
   if (confirm("Do you really want to delete this Author?")) {
     try {
-      await collection(db, "authors").doc(props.id).delete();
+      const docRef = doc(db, "authors", props.id);
+      await deleteDoc(docRef, books);
       router.push("/authors"); // redirect to author list
     } catch (err) {
       error.value = err.message;

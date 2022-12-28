@@ -27,7 +27,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
+import { doc, getDoc, deleteDoc } from "firebase/firestore";
 
 const props = defineProps(["id"]);
 
@@ -38,7 +38,8 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    const resp = await collection(db, "copies").doc(props.id).get();
+    const docRef = doc(db, "copies", props.id);
+    const resp = await getDoc(docRef);
     if (!resp.exists) {
       throw new Error("No Book Copy found with ID=" + props.id);
     }
@@ -51,7 +52,8 @@ onMounted(async () => {
 const deleteBookCopy = async () => {
   if (confirm("Do you really want to delete this book copy?")) {
     try {
-      await collection(db, "copies").doc(props.id).delete();
+      const docRef = doc(db, "copies", props.id);
+      await deleteDoc(docRef);
       router.push("/copies"); // redirect to book copy list
     } catch (err) {
       error.value = err.message;

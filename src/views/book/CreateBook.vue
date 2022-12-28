@@ -62,7 +62,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { db } from "@/firebase/config";
-import { collection } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
 const router = useRouter();
 
@@ -77,11 +77,14 @@ const error = ref(null);
 
 onMounted(async () => {
   try {
-    let data = await collection(db, "authors").get();
+    let colRef = collection(db, "authors");
+    let data = await getDocs(colRef);
     authors.value = data.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
-    data = await collection(db, "genres").get();
+
+    colRef = collection(db, "genres");
+    data = await getDocs(colRef);
     genres.value = data.docs.map((doc) => {
       return { ...doc.data(), id: doc.id };
     });
@@ -99,7 +102,8 @@ const handleSubmit = async () => {
     genreId: genreId.value,
   };
   try {
-    await collection(db, "books").add(book);
+    const colRef = collection(db, "books");
+    await addDoc(colRef, book);
     router.push("/books"); // redirect to book list
   } catch (err) {
     error.value = err.message;
