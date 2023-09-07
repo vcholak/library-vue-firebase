@@ -1,6 +1,6 @@
 <template>
+  <h1 class="text-5xl font-bold text-green-500">Welcome to Your Local Library</h1>
   <div>
-    <h1>Welcome to Your Local Library</h1>
     <div>
       <input v-model="search" type="text" placeholder="Search books" />
       <button>Search</button>
